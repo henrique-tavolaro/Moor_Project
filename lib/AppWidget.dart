@@ -5,6 +5,8 @@ import 'package:project/presenter/Pages/insert_products_page.dart';
 import 'package:project/presenter/Pages/insert_salesman_page.dart';
 import 'package:project/presenter/Pages/orders_page.dart';
 
+import 'Theme/AppColors.dart';
+
 class AppWidget extends StatelessWidget {
   const AppWidget({Key? key}) : super(key: key);
 
@@ -13,7 +15,9 @@ class AppWidget extends StatelessWidget {
     return MaterialApp(
       title: 'Sales Project',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: AppColors.primaryLight,
+        // primarySwatch: Colors.yellow,
+        primaryColor: AppColors.primary,
       ),
       initialRoute:
       // '/orders_page',

@@ -32,6 +32,7 @@ dependencies:
   flutter_masked_text2: ^0.9.1
   intl:
   moor_inspector:
+  fluttertoast:
 
 dev_dependencies:
   flutter_test:

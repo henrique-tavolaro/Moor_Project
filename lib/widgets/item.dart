@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:project/database/database.dart';
 import 'package:project/domain/model/fact.dart';
 
@@ -26,46 +27,55 @@ class _ItemState extends State<Item> {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            Expanded(
-              child: Container(
-                width: 10,
-                child: Text(
-                  widget.product.productName,
-                ),
+            Container(
+              width: 100,
+              child: Text(
+                widget.product.productName,
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(widget.product.price.toString()),
             ),
-            Container(
-              width: 30,
-              child: FloatingActionButton(
-                onPressed: () {
-                  counter--;
-                  setState(() {});
-                },
-                child: Text('-'),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Container(
+                width: 30,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    if(counter >0){
+                      counter--;
+                      setState(() {});
+                    }
+                  },
+                  child: Text('-'),
+                ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(counter.toString()),
             ),
-            Container(
-              width: 30,
-              child: FloatingActionButton(
-                onPressed: () {
-                  counter++;
-                  setState(() {});
-                },
-                child: Text('+'),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Container(
+                width: 30,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    counter++;
+                    setState(() {});
+                  },
+                  child: Text('+'),
+                ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(
-                counter == 0 ? 'R\$ 0' : totalPrice.toString(),
+              child: Container(
+                width: 40,
+                child: Text(
+                  counter == 0 ? '0.0' : totalPrice.toString(),
+                ),
               ),
             ),
             Container(
@@ -73,15 +83,20 @@ class _ItemState extends State<Item> {
               child: FloatingActionButton(
                 backgroundColor: Colors.green.shade800,
                 onPressed: () {
-                  final Fact fact = Fact(
+                  if(counter > 0){
+                    final Fact fact = Fact(
                       productId: widget.product.id,
                       productName: widget.product.productName,
                       quantity: counter,
                       unityPrice: widget.product.price,
                       totalPrice: totalPrice,
-                  );
-                  widget.factList.add(fact);
-                  print(fact.totalPrice.toString());
+                    );
+                    widget.factList.add(fact);
+                    final snackBar = SnackBar(content: Text('${widget.product.productName} added'), duration: Duration(seconds: 1),);
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    counter = 0;
+                    setState(() {});
+                  }
                 },
                 child: Icon(Icons.check, color: Colors.white),
               ),
@@ -103,18 +118,16 @@ class Header extends StatelessWidget {
       child: Row(
         children: [
           Container(
+            padding: EdgeInsets.all(8),
             width: 100,
             child: Text('product'),
-          ),
-          SizedBox(
-            width: 30,
           ),
           Container(
             width: 60,
             child: Text('Unit price'),
           ),
           SizedBox(
-            width: 20,
+            width: 25,
           ),
           Container(
             width: 55,
@@ -125,7 +138,7 @@ class Header extends StatelessWidget {
           ),
           Container(
             width: 80,
-            child: Text('Total'),
+            child: Text('Total \$CAD'),
           ),
         ],
       ),

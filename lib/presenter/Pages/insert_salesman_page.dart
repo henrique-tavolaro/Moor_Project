@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
 import 'package:project/domain/model/salesman.dart';
 import 'package:project/presenter/bloc/salesman_bloc/salesman_bloc.dart';
@@ -30,34 +31,58 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
       appBar: AppBar(
         title: Text('Insert Salesman'),
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          TextField(
-            controller: nameController,
-            decoration: InputDecoration(
-              labelText: 'Salesman name',
-            ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Add new salesman',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Salesman name',
+                  fillColor: Colors.white,
+                  filled: true
+
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: TextField(
+                  controller: subsidiaryController,
+                  decoration: InputDecoration(
+                    labelText: 'Subsidiary',
+                      fillColor: Colors.white,
+                      filled: true
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final salesman = SalesmanTableCompanion.insert(
+                        name: nameController.text,
+                        subsidiary: subsidiaryController.text,
+                        );
+                    salesmanBloc.add(InsertSalesmanEvent(salesman));
+                  },
+                  child: Text('Add salesman'),
+                ),
+              ),
+              // BlocWidget()
+              StreamB(),
+            ],
           ),
-          TextField(
-            controller: subsidiaryController,
-            decoration: InputDecoration(
-              labelText: 'Subsidiary',
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final salesman = SalesmanTableCompanion.insert(
-                  name: nameController.text,
-                  subsidiary: subsidiaryController.text,
-                  );
-              salesmanBloc.add(InsertSalesmanEvent(salesman));
-            },
-            child: Text('Add salesman'),
-          ),
-          // BlocWidget()
-          StreamB(),
-        ],
+        ),
       ),
     );
   }
@@ -79,20 +104,41 @@ class _StreamBState extends State<StreamB> {
       builder: (context, AsyncSnapshot<List<SalesmanTableData>> snapshot) {
         final salesmanList = snapshot.data ?? [];
 
-        return ListView.builder(
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          itemCount: salesmanList.length,
-          itemBuilder: (_, index) {
-            final salesman = salesmanList[index];
-            return Container(
-              height: 30,
-              child: ListTile(
-                title: Text('${salesman.name} ${salesman.id}'),
-              ),
-            );
-          },
-        );
+        if(salesmanList.isNotEmpty){
+          return ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: salesmanList.length,
+            itemBuilder: (_, index) {
+              final salesman = salesmanList[index];
+              return Card(
+                elevation: 2,
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(8),
+                  leading: CircleAvatar(
+                    radius: 25,
+                    child: Text(
+                      '${salesman.name[0]}',
+                      style: TextStyle(fontSize: 28),
+                    ),
+                    backgroundColor: AppColors.primaryDark,
+                  ),
+                  title: Text(
+                    salesman.name,
+                    style: TextStyle(fontSize: 22),
+                  ),
+                  subtitle: Text(
+                    salesman.subsidiary,
+                    style: TextStyle(fontSize: 18),
+                  ),
+
+                ),
+              );
+            },
+          );
+        } else {
+          return Text('No salesman registered');
+        }
       },
     );
   }
