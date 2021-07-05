@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
@@ -32,54 +33,68 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
         title: Text('Insert Salesman'),
       ),
       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Add new salesman',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Salesman name',
-                  fillColor: Colors.white,
-                  filled: true
-
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: TextField(
-                  controller: subsidiaryController,
-                  decoration: InputDecoration(
-                    labelText: 'Subsidiary',
-                      fillColor: Colors.white,
-                      filled: true
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Add new salesman',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    final salesman = SalesmanTableCompanion.insert(
-                        name: nameController.text,
-                        subsidiary: subsidiaryController.text,
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                        labelText: 'Salesman name',
+                        fillColor: Colors.white,
+                        filled: true
+
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: TextField(
+                      controller: subsidiaryController,
+                      decoration: InputDecoration(
+                          labelText: 'Subsidiary',
+                          fillColor: Colors.white,
+                          filled: true
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final salesman = SalesmanTableCompanion.insert(
+                          name: nameController.text,
+                          subsidiary: subsidiaryController.text,
                         );
-                    salesmanBloc.add(InsertSalesmanEvent(salesman));
-                  },
-                  child: Text('Add salesman'),
+                        salesmanBloc.add(InsertSalesmanEvent(salesman));
+                      },
+                      child: Text('Add salesman'),
+                    ),
+                  ),
+                ],
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    StreamB(),
+                  ],
                 ),
               ),
+
               // BlocWidget()
-              StreamB(),
+
             ],
           ),
         ),
@@ -100,12 +115,14 @@ class _StreamBState extends State<StreamB> {
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<SalesmanBloc>(context).dao.watchAllSalesman();
     return StreamBuilder<List<SalesmanTableData>>(
+
       stream: bloc,
       builder: (context, AsyncSnapshot<List<SalesmanTableData>> snapshot) {
         final salesmanList = snapshot.data ?? [];
 
         if(salesmanList.isNotEmpty){
           return ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: salesmanList.length,

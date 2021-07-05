@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project/Theme/AppColors.dart';
 
-class OrdersChips extends StatefulWidget {
+class RegisterOrdersChips extends StatefulWidget {
   final VoidCallback? onTap;
   final String text;
   final Color color;
-  const OrdersChips({
+  const RegisterOrdersChips({
     Key? key,
     this.onTap,
     required this.text,
@@ -14,10 +14,10 @@ class OrdersChips extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _OrdersChipsState createState() => _OrdersChipsState();
+  _RegisterOrdersChipsState createState() => _RegisterOrdersChipsState();
 }
 
-class _OrdersChipsState extends State<OrdersChips> {
+class _RegisterOrdersChipsState extends State<RegisterOrdersChips> {
   @override
   Widget build(BuildContext context) {
     return Container(

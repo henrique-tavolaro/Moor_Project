@@ -1,27 +1,14 @@
-import 'dart:core';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
-import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
-import 'package:project/domain/model/fact.dart';
-import 'package:project/presenter/bloc/fact_bloc/fact_bloc.dart';
 import 'package:project/presenter/bloc/orders_bloc/orders_bloc.dart';
-import 'package:project/presenter/bloc/product_bloc/product_bloc.dart';
-import 'package:project/presenter/bloc/product_bloc/product_event.dart';
-import 'package:project/presenter/bloc/product_bloc/product_state.dart';
-import 'package:project/presenter/bloc/salesman_bloc/salesman_bloc.dart';
-import 'package:project/presenter/bloc/salesman_bloc/salesman_event.dart';
-import 'package:project/presenter/bloc/salesman_bloc/salesman_state.dart';
+import 'package:project/presenter/bloc/orders_bloc/orders_event.dart';
+import 'package:project/presenter/bloc/orders_bloc/orders_state.dart';
 import 'package:project/widgets/bottom_dialog.dart';
-import 'package:project/widgets/item.dart';
-import 'package:project/widgets/orders_chips.dart';
+import 'package:project/widgets/order_summary.dart';
+import 'package:project/widgets/orders_item.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({Key? key}) : super(key: key);
@@ -31,25 +18,7 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  late SalesmanBloc salesmanBloc;
-  late ProductsBloc productsBloc;
-  List<Fact> factList = [];
-
-  late OrdersBloc ordersBloc;
-  late FactBloc factBloc;
-
-  @override
-  void initState() {
-    salesmanBloc = BlocProvider.of<SalesmanBloc>(context);
-    salesmanBloc.add(GetAllSalesmanEvent());
-
-    productsBloc = BlocProvider.of<ProductsBloc>(context);
-    productsBloc.add(GetAllProductsEvent());
-
-    factBloc = BlocProvider.of<FactBloc>(context);
-    ordersBloc = BlocProvider.of<OrdersBloc>(context);
-    super.initState();
-  }
+  String dropdownValue = 'All orders';
 
   @override
   Widget build(BuildContext context) {
@@ -57,256 +26,281 @@ class _OrdersPageState extends State<OrdersPage> {
       appBar: AppBar(
         title: Text('Orders'),
         actions: [
-          IconButton(
-              onPressed: () async {
-                Fluttertoast.showToast(
-                    msg:
-                    'Select a salesman',
-                    textColor: Colors.black,
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    backgroundColor: Colors.white,
-                    timeInSecForIosWeb: 3);
+          DropdownButton(
+            value: dropdownValue,
+            icon: Icon(Icons.arrow_downward),
+            onChanged: (String? newValue) {
+              setState(() {
+                dropdownValue = newValue!;
+              });
+            },
+            items: <String>['All orders', 'Open', 'Canceled', 'Closed']
+                .map<DropdownMenuItem<String>>(
+              (String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
               },
-              icon: Icon(Icons.add_chart))
+            ).toList(),
+          )
         ],
       ),
-      body: OrdersBody(factList: factList),
+      body: OrdersBody(
+        dropdownValue: dropdownValue,
+      ),
     );
   }
 }
 
-void ShowBottomDialog(
-  BuildContext context,
-  List<Fact> factList,
-  String? date,
-  SalesmanTableData? salesman,
-) {
-  showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return BottomDialog(factList: factList, date: date, salesman: salesman);
-      });
-}
-
 class OrdersBody extends StatefulWidget {
-  const OrdersBody({Key? key, required this.factList}) : super(key: key);
-  final List<Fact> factList;
+  final String dropdownValue;
+
+  const OrdersBody({Key? key, required this.dropdownValue}) : super(key: key);
 
   @override
   _OrdersBodyState createState() => _OrdersBodyState();
 }
 
 class _OrdersBodyState extends State<OrdersBody> {
-  final dateController = TextEditingController();
+  late OrdersBloc ordersBloc;
+  final controller = ScrollController();
+  String query = '';
 
-  SalesmanTableData? selectedSalesman;
-  final dateFormat = DateFormat('dd/MM/yyyy');
+  @override
+  void initState() {
+    ordersBloc = BlocProvider.of<OrdersBloc>(context);
+    ordersBloc.add(GetAllOrdersEvent());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        children: [
-          Container(
-            height: 120,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                            onTap: () async {
-                              DateTime? datetime = (await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2021),
-                                lastDate: DateTime(2030),
-                              ));
-                              var dateFormatted = dateFormat.format(datetime!);
-                              dateController.text = dateFormatted.toString();
-                              setState(() {});
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: Colors.white,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 16),
-                                      child:
-                                          Icon(Icons.calendar_today, size: 22),
-                                    ),
-                                    Text(
-                                      dateController.text.isEmpty
-                                          ? dateFormat.format(DateTime.now())
-                                          : dateController.text,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ))
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OrdersChips(
-                          onTap: () {
-                            if (selectedSalesman == null) {
-                              Fluttertoast.showToast(
-                                  msg:
-                                      'Select a salesman',
-                                  textColor: Colors.black,
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  backgroundColor: Colors.white,
-                                  timeInSecForIosWeb: 3);
-                            } else if (widget.factList.isEmpty) {
-                              Fluttertoast.showToast(
-                                  msg:
-                                  'Add a product to check the summary',
-                                  textColor: Colors.black,
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  backgroundColor: Colors.white,
-                                  timeInSecForIosWeb: 3);
-                            } else {
-                              ShowBottomDialog(context, widget.factList,
-                                  dateController.text.isEmpty
-                                      ? dateFormat.format(DateTime.now())
-                                      : dateController.text, selectedSalesman);
-                            }
-                          },
-                          text: 'Order Summary',
-                          color: AppColors.secondary,
-                        ),
-                        BlocBuilder<SalesmanBloc, SalesmanStateBloc>(
-                          builder: (context, state) {
-                            if (state is GetSalesmanSuccessState) {
-                              final list = state.salesmanList;
-                              DropdownMenuItem<SalesmanTableData>
-                                  dropdownFromSalesman(
-                                      SalesmanTableData salesman) {
-                                return DropdownMenuItem(
-                                    value: salesman,
-                                    child: OrdersChips(
-                                      text: salesman.name,
-                                      color: Colors.white,
-                                    )
-                                    // Row(
-                                    //   children: <Widget>[
-                                    //     Text(salesman.name),
-                                    //   ],
-                                    // ),
-                                    );
-                              }
+      padding: const EdgeInsets.all(8.0),
+      child: SingleChildScrollView(
+        controller: controller,
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            Card(
+              child: Container(
+                padding: EdgeInsets.all(16),
+                width: double.maxFinite,
+                child: Column(
+                  children: [
+                    StreamBuilder(
+                        stream: BlocProvider.of<OrdersBloc>(context)
+                            .dao
+                            .getOrderWithFacts(query),
+                        builder: (context,
+                            AsyncSnapshot<List<OrderWithFacts>> snapshot) {
+                          final list = snapshot.data ?? [];
 
-                              final dropdownMenuItems = list
-                                  .map((salesman) =>
-                                      dropdownFromSalesman(salesman))
-                                  .toList()
-                                    ..insert(
-                                      0,
-                                      DropdownMenuItem(
-                                        value: null,
-                                        child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              left: 24.0,
-                                            ),
-                                            child: Text('select salesman')),
-                                      ),
-                                    );
-
-                              return Container(
-                                width: 200,
-                                padding: EdgeInsets.only(right: 24),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: Colors.white,
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                    onChanged: (SalesmanTableData? salesman) {
-                                      setState(() {
-                                        selectedSalesman = salesman;
-                                      });
-                                    },
-                                    isExpanded: false,
-                                    value: selectedSalesman,
-                                    items: dropdownMenuItems,
+                          if (list.isNotEmpty) {
+                            return BlocListener<OrdersBloc, OrdersState>(
+                              listener: (context, state) {
+                                if (state is UpdateState) {
+                                  final OrdersTableData orderUndo =
+                                      OrdersTableData(
+                                    id: list[0].order.id,
+                                    status: 'Open',
+                                    totalCost: list[0].order.totalCost,
+                                    date: list[0].order.date,
+                                  );
+                                  final snackBar = SnackBar(
+                                    content: Text('Order updated'),
+                                    duration: Duration(seconds: 6),
+                                    action: SnackBarAction(
+                                      label: 'Undo',
+                                      onPressed: () {
+                                        ordersBloc
+                                            .add(UpdateOrderEvent(orderUndo));
+                                      },
+                                    ),
+                                  );
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                }
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            if (list[0].order.status !=
+                                                'Open') {
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                      'This order was ${list[0].order.status}',
+                                                  textColor: Colors.black,
+                                                  toastLength:
+                                                      Toast.LENGTH_SHORT,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  backgroundColor: Colors.white,
+                                                  timeInSecForIosWeb: 3);
+                                            } else {
+                                              final OrdersTableData order =
+                                                  OrdersTableData(
+                                                id: list[0].order.id,
+                                                status: 'Canceled',
+                                                totalCost:
+                                                    list[0].order.totalCost,
+                                                date: list[0].order.date,
+                                              );
+                                              ordersBloc
+                                                  .add(UpdateOrderEvent(order));
+                                            }
+                                          },
+                                          child: Text('Cancel Order'),
+                                          style: ElevatedButton.styleFrom(
+                                              primary:
+                                                  list[0].order.status != 'Open'
+                                                      ? Colors.grey
+                                                      : Colors.red),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            if (list[0].order.status !=
+                                                'Open') {
+                                              Fluttertoast.showToast(
+                                                msg:
+                                                    'This order was ${list[0].order.status}',
+                                                textColor: Colors.black,
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.BOTTOM,
+                                                backgroundColor: Colors.white,
+                                                timeInSecForIosWeb: 3,
+                                              );
+                                            } else {
+                                              final OrdersTableData order =
+                                                  OrdersTableData(
+                                                id: list[0].order.id,
+                                                status: 'Closed',
+                                                totalCost:
+                                                    list[0].order.totalCost,
+                                                date: list[0].order.date,
+                                              );
+                                              ordersBloc
+                                                  .add(UpdateOrderEvent(order));
+                                            }
+                                          },
+                                          child: Text('Close Order'),
+                                          style: ElevatedButton.styleFrom(
+                                              primary:
+                                                  list[0].order.status != 'Open'
+                                                      ? Colors.grey
+                                                      : Colors.blue),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            } else {
-                              return Text('no salesman');
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                                  ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: list.length,
+                                    itemBuilder: (context, index) {
+                                      if (index == 0) {
+                                        return Column(
+                                          children: [
+                                            OrderSummaryHeader(
+                                                orderWithFacts: list[0]),
+                                            OrderSummary(
+                                                orderWithFact: list[index])
+                                          ],
+                                        );
+                                      }
+                                      return OrderSummary(
+                                          orderWithFact: list[index]);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Text('vazio');
+                          }
+                        })
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Card(
-            child: BlocBuilder<ProductsBloc, ProductsState>(
-              builder: (context, state) {
-                if (state is GetSuccessState) {
-                  final list = state.productsList;
-                  return ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: list.length,
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return Column(
-                          children: [
-                            Header(),
-                            Item(
-                              product: list[index],
-                              factList: widget.factList,
-                            )
-                          ],
-                        );
-                      }
-                      return Item(
-                        product: list[index],
-                        factList: widget.factList,
+            SizedBox(
+              height: 30,
+            ),
+            Card(
+              child: Container(
+                width: double.maxFinite,
+                child: StreamBuilder<List<OrdersTableData>>(
+                  stream: widget.dropdownValue == 'All orders'
+                      ? BlocProvider.of<OrdersBloc>(context)
+                          .dao
+                          .watchAllOrders()
+                      : widget.dropdownValue == 'Open'
+                          ? BlocProvider.of<OrdersBloc>(context)
+                              .dao
+                              .watchOpenOrders()
+                          : widget.dropdownValue == 'Closed'
+                              ? BlocProvider.of<OrdersBloc>(context)
+                                  .dao
+                                  .watchClosedOrders()
+                              : BlocProvider.of<OrdersBloc>(context)
+                                  .dao
+                                  .watchCanceledOrders(),
+                  builder:
+                      (context, AsyncSnapshot<List<OrdersTableData>> snapshot) {
+                    final ordersList = snapshot.data ?? [];
+
+                    if (ordersList.isNotEmpty) {
+                      return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: ordersList.length,
+                        itemBuilder: (_, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              query = ordersList[index].id;
+                              setState(() {});
+                              print(query);
+                              _scrollToTop();
+                            },
+                            child: OrderItem(
+                              order: ordersList[index],
+                            ),
+                          );
+                        },
                       );
-                    },
-                  );
-                } else {
-                  return Text('no products');
-                }
-              },
-            ),
-          ),
-        ],
+                    } else {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(64.0),
+                          child: Text('No order registered'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  void _scrollToTop() {
+    controller.animateTo(0,
+        duration: Duration(seconds: 1), curve: Curves.fastLinearToSlowEaseIn);
   }
 }

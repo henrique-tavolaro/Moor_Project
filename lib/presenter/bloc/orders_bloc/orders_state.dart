@@ -30,6 +30,14 @@ class ErrorState extends OrdersState {
   List<Object?> get props => throw UnimplementedError();
 }
 
+class LoadingState extends OrdersState {
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw [];
+
+}
+
 class GetSuccessState extends OrdersState {
   final List<OrdersTableData> ordersList;
 
@@ -38,5 +46,14 @@ class GetSuccessState extends OrdersState {
   @override
   // TODO: implement props
   List<Object?> get props => throw UnimplementedError();
+
+}
+
+class UpdateState extends OrdersState {
+
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw [];
 
 }

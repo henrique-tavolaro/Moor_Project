@@ -4,6 +4,7 @@ import 'package:project/presenter/Pages/home_page.dart';
 import 'package:project/presenter/Pages/insert_products_page.dart';
 import 'package:project/presenter/Pages/insert_salesman_page.dart';
 import 'package:project/presenter/Pages/orders_page.dart';
+import 'package:project/presenter/Pages/register_orders_page.dart';
 
 import 'Theme/AppColors.dart';
 
@@ -26,6 +27,7 @@ class AppWidget extends StatelessWidget {
         '/home_page': (context) => HomePage(),
         '/insert_salesman': (context) => InsertSalesmanPage(),
         '/insert_product': (context) => InsertProductsPage(),
+        '/register_orders_page': (context) => RegisterOrdersPage(),
         '/orders_page': (context) => OrdersPage(),
       },
     );

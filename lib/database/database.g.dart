@@ -465,7 +465,13 @@ class $ProductsTableTable extends ProductsTable
 class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
   final String id;
   final double totalCost;
-  OrdersTableData({required this.id, required this.totalCost});
+  final String status;
+  final String date;
+  OrdersTableData(
+      {required this.id,
+      required this.totalCost,
+      required this.status,
+      required this.date});
   factory OrdersTableData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
@@ -475,6 +481,10 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       totalCost: const RealType()
           .mapFromDatabaseResponse(data['${effectivePrefix}total_cost'])!,
+      status: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}status'])!,
+      date: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}date'])!,
     );
   }
   @override
@@ -482,6 +492,8 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['total_cost'] = Variable<double>(totalCost);
+    map['status'] = Variable<String>(status);
+    map['date'] = Variable<String>(date);
     return map;
   }
 
@@ -489,6 +501,8 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     return OrdersTableCompanion(
       id: Value(id),
       totalCost: Value(totalCost),
+      status: Value(status),
+      date: Value(date),
     );
   }
 
@@ -498,6 +512,8 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     return OrdersTableData(
       id: serializer.fromJson<String>(json['id']),
       totalCost: serializer.fromJson<double>(json['totalCost']),
+      status: serializer.fromJson<String>(json['status']),
+      date: serializer.fromJson<String>(json['date']),
     );
   }
   @override
@@ -506,58 +522,87 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'totalCost': serializer.toJson<double>(totalCost),
+      'status': serializer.toJson<String>(status),
+      'date': serializer.toJson<String>(date),
     };
   }
 
-  OrdersTableData copyWith({String? id, double? totalCost}) => OrdersTableData(
+  OrdersTableData copyWith(
+          {String? id, double? totalCost, String? status, String? date}) =>
+      OrdersTableData(
         id: id ?? this.id,
         totalCost: totalCost ?? this.totalCost,
+        status: status ?? this.status,
+        date: date ?? this.date,
       );
   @override
   String toString() {
     return (StringBuffer('OrdersTableData(')
           ..write('id: $id, ')
-          ..write('totalCost: $totalCost')
+          ..write('totalCost: $totalCost, ')
+          ..write('status: $status, ')
+          ..write('date: $date')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(id.hashCode, totalCost.hashCode));
+  int get hashCode => $mrjf($mrjc(id.hashCode,
+      $mrjc(totalCost.hashCode, $mrjc(status.hashCode, date.hashCode))));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is OrdersTableData &&
           other.id == this.id &&
-          other.totalCost == this.totalCost);
+          other.totalCost == this.totalCost &&
+          other.status == this.status &&
+          other.date == this.date);
 }
 
 class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
   final Value<String> id;
   final Value<double> totalCost;
+  final Value<String> status;
+  final Value<String> date;
   const OrdersTableCompanion({
     this.id = const Value.absent(),
     this.totalCost = const Value.absent(),
+    this.status = const Value.absent(),
+    this.date = const Value.absent(),
   });
   OrdersTableCompanion.insert({
     required String id,
     required double totalCost,
+    required String status,
+    required String date,
   })  : id = Value(id),
-        totalCost = Value(totalCost);
+        totalCost = Value(totalCost),
+        status = Value(status),
+        date = Value(date);
   static Insertable<OrdersTableData> custom({
     Expression<String>? id,
     Expression<double>? totalCost,
+    Expression<String>? status,
+    Expression<String>? date,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (totalCost != null) 'total_cost': totalCost,
+      if (status != null) 'status': status,
+      if (date != null) 'date': date,
     });
   }
 
-  OrdersTableCompanion copyWith({Value<String>? id, Value<double>? totalCost}) {
+  OrdersTableCompanion copyWith(
+      {Value<String>? id,
+      Value<double>? totalCost,
+      Value<String>? status,
+      Value<String>? date}) {
     return OrdersTableCompanion(
       id: id ?? this.id,
       totalCost: totalCost ?? this.totalCost,
+      status: status ?? this.status,
+      date: date ?? this.date,
     );
   }
 
@@ -570,6 +615,12 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     if (totalCost.present) {
       map['total_cost'] = Variable<double>(totalCost.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
     return map;
   }
 
@@ -577,7 +628,9 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
   String toString() {
     return (StringBuffer('OrdersTableCompanion(')
           ..write('id: $id, ')
-          ..write('totalCost: $totalCost')
+          ..write('totalCost: $totalCost, ')
+          ..write('status: $status, ')
+          ..write('date: $date')
           ..write(')'))
         .toString();
   }
@@ -610,8 +663,30 @@ class $OrdersTableTable extends OrdersTable
     );
   }
 
+  final VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  List<GeneratedColumn> get $columns => [id, totalCost];
+  late final GeneratedTextColumn status = _constructStatus();
+  GeneratedTextColumn _constructStatus() {
+    return GeneratedTextColumn(
+      'status',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedTextColumn date = _constructDate();
+  GeneratedTextColumn _constructDate() {
+    return GeneratedTextColumn(
+      'date',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [id, totalCost, status, date];
   @override
   $OrdersTableTable get asDslTable => this;
   @override
@@ -633,6 +708,18 @@ class $OrdersTableTable extends OrdersTable
           totalCost.isAcceptableOrUnknown(data['total_cost']!, _totalCostMeta));
     } else if (isInserting) {
       context.missing(_totalCostMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
     }
     return context;
   }
@@ -1192,6 +1279,7 @@ mixin _$FactTableDaoMixin on DatabaseAccessor<AppDatabase> {
 }
 mixin _$OrdersTableDaoMixin on DatabaseAccessor<AppDatabase> {
   $OrdersTableTable get ordersTable => attachedDatabase.ordersTable;
+  $FactTableTable get factTable => attachedDatabase.factTable;
 }
 mixin _$SalesmanDaoMixin on DatabaseAccessor<AppDatabase> {
   $SalesmanTableTable get salesmanTable => attachedDatabase.salesmanTable;

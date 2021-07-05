@@ -50,7 +50,9 @@ class BodyContent extends StatelessWidget {
                 HomePageCard(
                   cardName: 'Orders',
                   icon: Icons.shopping_cart_rounded,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/orders_page');
+                  },
                 ),
                 HomePageCard(
                   cardName: 'Dashboard',
@@ -67,7 +69,7 @@ class BodyContent extends StatelessWidget {
               icon: Icons.add,
               cardName: 'Register new order',
               onTap: () {
-                Navigator.pushNamed(context, '/orders_page');
+                Navigator.pushNamed(context, '/register_orders_page');
               },
             ),
           ),

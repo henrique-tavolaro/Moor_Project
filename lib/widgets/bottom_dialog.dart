@@ -81,6 +81,9 @@ class _BottomDialogState extends State<BottomDialog> {
                     final OrdersTableData order = OrdersTableData(
                       id: uuid,
                       totalCost: totalCost,
+                      status: 'Open',
+                      date: widget.date!,
+
                     );
 
                     ordersBloc.add(InsertOrdersEvent(order));
@@ -99,8 +102,8 @@ class _BottomDialogState extends State<BottomDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Date: ${widget.date!}' ?? 'no date selected'),
-                  Text('Salesman: ${widget.salesman!.name}' ?? 'no salesman selected')
+                  Text('Date: ${widget.date!}'),
+                  Text('Salesman: ${widget.salesman!.name}')
                 ],
               ),
             ),

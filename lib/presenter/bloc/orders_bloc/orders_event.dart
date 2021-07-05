@@ -20,5 +20,15 @@ class GetAllOrdersEvent extends OrdersEvent {
   @override
   // TODO: implement props
   List<Object?> get props => throw UnimplementedError();
+}
+
+class UpdateOrderEvent extends OrdersEvent {
+  final OrdersTableData orders;
+
+  UpdateOrderEvent(this.orders);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
 
 }

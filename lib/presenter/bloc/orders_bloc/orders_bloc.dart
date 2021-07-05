@@ -21,9 +21,18 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       }
     }
     if(event is GetAllOrdersEvent){
+      yield LoadingState();
       try{
         final list = await dao.getAllOrders();
         yield GetSuccessState(list);
+      } catch(e) {
+        yield ErrorState(e.toString());
+      }
+    }
+    if(event is UpdateOrderEvent){
+      try{
+        await dao.updateOrder(event.orders);
+        yield UpdateState();
       } catch(e) {
         yield ErrorState(e.toString());
       }
