@@ -82,7 +82,7 @@ class _InsertProductsPageState extends State<InsertProductsPage> {
                   child: Text('Add product'),
                 ),
               ),
-              StreamB(),
+              ProductsList(),
             ],
           ),
         ),
@@ -91,14 +91,14 @@ class _InsertProductsPageState extends State<InsertProductsPage> {
   }
 }
 
-class StreamB extends StatefulWidget {
-  const StreamB({Key? key}) : super(key: key);
+class ProductsList extends StatefulWidget {
+  const ProductsList({Key? key}) : super(key: key);
 
   @override
-  _StreamBState createState() => _StreamBState();
+  _ProductsListState createState() => _ProductsListState();
 }
 
-class _StreamBState extends State<StreamB> {
+class _ProductsListState extends State<ProductsList> {
   @override
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<ProductsBloc>(context).dao.watchAllProducts();
@@ -109,6 +109,7 @@ class _StreamBState extends State<StreamB> {
 
         if(productsList.isNotEmpty){
           return ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: productsList.length,

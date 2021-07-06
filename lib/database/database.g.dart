@@ -466,7 +466,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
   final String id;
   final double totalCost;
   final String status;
-  final String date;
+  final DateTime date;
   OrdersTableData(
       {required this.id,
       required this.totalCost,
@@ -483,7 +483,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
           .mapFromDatabaseResponse(data['${effectivePrefix}total_cost'])!,
       status: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}status'])!,
-      date: const StringType()
+      date: const DateTimeType()
           .mapFromDatabaseResponse(data['${effectivePrefix}date'])!,
     );
   }
@@ -493,7 +493,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     map['id'] = Variable<String>(id);
     map['total_cost'] = Variable<double>(totalCost);
     map['status'] = Variable<String>(status);
-    map['date'] = Variable<String>(date);
+    map['date'] = Variable<DateTime>(date);
     return map;
   }
 
@@ -513,7 +513,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
       id: serializer.fromJson<String>(json['id']),
       totalCost: serializer.fromJson<double>(json['totalCost']),
       status: serializer.fromJson<String>(json['status']),
-      date: serializer.fromJson<String>(json['date']),
+      date: serializer.fromJson<DateTime>(json['date']),
     );
   }
   @override
@@ -523,12 +523,12 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
       'id': serializer.toJson<String>(id),
       'totalCost': serializer.toJson<double>(totalCost),
       'status': serializer.toJson<String>(status),
-      'date': serializer.toJson<String>(date),
+      'date': serializer.toJson<DateTime>(date),
     };
   }
 
   OrdersTableData copyWith(
-          {String? id, double? totalCost, String? status, String? date}) =>
+          {String? id, double? totalCost, String? status, DateTime? date}) =>
       OrdersTableData(
         id: id ?? this.id,
         totalCost: totalCost ?? this.totalCost,
@@ -563,7 +563,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
   final Value<String> id;
   final Value<double> totalCost;
   final Value<String> status;
-  final Value<String> date;
+  final Value<DateTime> date;
   const OrdersTableCompanion({
     this.id = const Value.absent(),
     this.totalCost = const Value.absent(),
@@ -574,7 +574,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     required String id,
     required double totalCost,
     required String status,
-    required String date,
+    required DateTime date,
   })  : id = Value(id),
         totalCost = Value(totalCost),
         status = Value(status),
@@ -583,7 +583,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     Expression<String>? id,
     Expression<double>? totalCost,
     Expression<String>? status,
-    Expression<String>? date,
+    Expression<DateTime>? date,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -597,7 +597,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
       {Value<String>? id,
       Value<double>? totalCost,
       Value<String>? status,
-      Value<String>? date}) {
+      Value<DateTime>? date}) {
     return OrdersTableCompanion(
       id: id ?? this.id,
       totalCost: totalCost ?? this.totalCost,
@@ -619,7 +619,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
       map['status'] = Variable<String>(status.value);
     }
     if (date.present) {
-      map['date'] = Variable<String>(date.value);
+      map['date'] = Variable<DateTime>(date.value);
     }
     return map;
   }
@@ -676,9 +676,9 @@ class $OrdersTableTable extends OrdersTable
 
   final VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
-  late final GeneratedTextColumn date = _constructDate();
-  GeneratedTextColumn _constructDate() {
-    return GeneratedTextColumn(
+  late final GeneratedDateTimeColumn date = _constructDate();
+  GeneratedDateTimeColumn _constructDate() {
+    return GeneratedDateTimeColumn(
       'date',
       $tableName,
       false,
@@ -741,7 +741,7 @@ class $OrdersTableTable extends OrdersTable
 class FactTableData extends DataClass implements Insertable<FactTableData> {
   final String id;
   final String orderId;
-  final String date;
+  final DateTime date;
   final String salesmanId;
   final String productId;
   final String productName;
@@ -767,7 +767,7 @@ class FactTableData extends DataClass implements Insertable<FactTableData> {
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       orderId: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}order_id'])!,
-      date: const StringType()
+      date: const DateTimeType()
           .mapFromDatabaseResponse(data['${effectivePrefix}date'])!,
       salesmanId: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}salesman_id'])!,
@@ -788,7 +788,7 @@ class FactTableData extends DataClass implements Insertable<FactTableData> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['order_id'] = Variable<String>(orderId);
-    map['date'] = Variable<String>(date);
+    map['date'] = Variable<DateTime>(date);
     map['salesman_id'] = Variable<String>(salesmanId);
     map['product_id'] = Variable<String>(productId);
     map['product_name'] = Variable<String>(productName);
@@ -818,7 +818,7 @@ class FactTableData extends DataClass implements Insertable<FactTableData> {
     return FactTableData(
       id: serializer.fromJson<String>(json['id']),
       orderId: serializer.fromJson<String>(json['orderId']),
-      date: serializer.fromJson<String>(json['date']),
+      date: serializer.fromJson<DateTime>(json['date']),
       salesmanId: serializer.fromJson<String>(json['salesmanId']),
       productId: serializer.fromJson<String>(json['productId']),
       productName: serializer.fromJson<String>(json['productName']),
@@ -833,7 +833,7 @@ class FactTableData extends DataClass implements Insertable<FactTableData> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'orderId': serializer.toJson<String>(orderId),
-      'date': serializer.toJson<String>(date),
+      'date': serializer.toJson<DateTime>(date),
       'salesmanId': serializer.toJson<String>(salesmanId),
       'productId': serializer.toJson<String>(productId),
       'productName': serializer.toJson<String>(productName),
@@ -846,7 +846,7 @@ class FactTableData extends DataClass implements Insertable<FactTableData> {
   FactTableData copyWith(
           {String? id,
           String? orderId,
-          String? date,
+          DateTime? date,
           String? salesmanId,
           String? productId,
           String? productName,
@@ -915,7 +915,7 @@ class FactTableData extends DataClass implements Insertable<FactTableData> {
 class FactTableCompanion extends UpdateCompanion<FactTableData> {
   final Value<String> id;
   final Value<String> orderId;
-  final Value<String> date;
+  final Value<DateTime> date;
   final Value<String> salesmanId;
   final Value<String> productId;
   final Value<String> productName;
@@ -936,7 +936,7 @@ class FactTableCompanion extends UpdateCompanion<FactTableData> {
   FactTableCompanion.insert({
     this.id = const Value.absent(),
     required String orderId,
-    required String date,
+    required DateTime date,
     required String salesmanId,
     required String productId,
     required String productName,
@@ -954,7 +954,7 @@ class FactTableCompanion extends UpdateCompanion<FactTableData> {
   static Insertable<FactTableData> custom({
     Expression<String>? id,
     Expression<String>? orderId,
-    Expression<String>? date,
+    Expression<DateTime>? date,
     Expression<String>? salesmanId,
     Expression<String>? productId,
     Expression<String>? productName,
@@ -978,7 +978,7 @@ class FactTableCompanion extends UpdateCompanion<FactTableData> {
   FactTableCompanion copyWith(
       {Value<String>? id,
       Value<String>? orderId,
-      Value<String>? date,
+      Value<DateTime>? date,
       Value<String>? salesmanId,
       Value<String>? productId,
       Value<String>? productName,
@@ -1008,7 +1008,7 @@ class FactTableCompanion extends UpdateCompanion<FactTableData> {
       map['order_id'] = Variable<String>(orderId.value);
     }
     if (date.present) {
-      map['date'] = Variable<String>(date.value);
+      map['date'] = Variable<DateTime>(date.value);
     }
     if (salesmanId.present) {
       map['salesman_id'] = Variable<String>(salesmanId.value);
@@ -1077,9 +1077,9 @@ class $FactTableTable extends FactTable
 
   final VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
-  late final GeneratedTextColumn date = _constructDate();
-  GeneratedTextColumn _constructDate() {
-    return GeneratedTextColumn(
+  late final GeneratedDateTimeColumn date = _constructDate();
+  GeneratedDateTimeColumn _constructDate() {
+    return GeneratedDateTimeColumn(
       'date',
       $tableName,
       false,

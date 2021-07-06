@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,7 +35,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 dropdownValue = newValue!;
               });
             },
-            items: <String>['All orders', 'Open', 'Canceled', 'Closed']
+            items: <String>[OrderStatus.AllOrders.status, OrderStatus.Open.status, OrderStatus.Closed.status, OrderStatus.Canceled.status, ]
                 .map<DropdownMenuItem<String>>(
               (String value) {
                 return DropdownMenuItem<String>(
@@ -302,5 +303,32 @@ class _OrdersBodyState extends State<OrdersBody> {
   void _scrollToTop() {
     controller.animateTo(0,
         duration: Duration(seconds: 1), curve: Curves.fastLinearToSlowEaseIn);
+  }
+}
+
+enum OrderStatus {
+  Open,
+  Closed,
+  Canceled,
+  AllOrders,
+}
+
+extension OrderStatusExtension on OrderStatus {
+  String get name => describeEnum(this);
+
+  String get status {
+    switch (this) {
+      case OrderStatus.Open:
+        return 'Open';
+      case OrderStatus.Closed:
+        // TODO: Handle this case.
+        return 'Closed';
+      case OrderStatus.Canceled:
+        return 'Canceled';
+      case OrderStatus.AllOrders:
+        return 'All orders';
+      default:
+        return 'No status';
+    }
   }
 }

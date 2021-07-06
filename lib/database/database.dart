@@ -36,7 +36,7 @@ class OrdersTable extends Table {
 
   TextColumn get status => text()();
 
-  TextColumn get date => text()();
+  DateTimeColumn get date => dateTime()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -49,7 +49,7 @@ class FactTable extends Table {
 
   TextColumn get orderId => text()();
 
-  TextColumn get date => text()();
+  DateTimeColumn get date => dateTime()();
 
   TextColumn get salesmanId => text()();
 
@@ -63,6 +63,7 @@ class FactTable extends Table {
 
   RealColumn get totalPrice => real()();
 }
+
 
 @UseDao(tables: [FactTable])
 class FactTableDao extends DatabaseAccessor<AppDatabase>
@@ -78,6 +79,7 @@ class FactTableDao extends DatabaseAccessor<AppDatabase>
   Future insertFact(FactTableCompanion fact) => into(factTable).insert(fact);
 }
 
+
 @UseDao(tables: [OrdersTable, FactTable])
 class OrdersTableDao extends DatabaseAccessor<AppDatabase>
     with _$OrdersTableDaoMixin {
@@ -91,7 +93,7 @@ class OrdersTableDao extends DatabaseAccessor<AppDatabase>
 
   Future updateOrder(OrdersTableData order) => update(ordersTable).replace(order);
 
-  Stream<List<OrdersTableData>> watchAllOrders() => select(ordersTable).watch();
+  Stream<List<OrdersTableData>> watchAllOrders() => (select(ordersTable)..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)])).watch();
 
   Stream<List<OrdersTableData>> watchOpenOrders() {
     return (select(ordersTable)
@@ -127,17 +129,6 @@ class OrdersTableDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-@UseMoor(
-    tables: [SalesmanTable, ProductsTable, OrdersTable, FactTable],
-    daos: [SalesmanDao, ProductsDao, FactTableDao, OrdersTableDao])
-class AppDatabase extends _$AppDatabase {
-  AppDatabase()
-      : super((FlutterQueryExecutor.inDatabaseFolder(
-            path: 'db.sqlite', logStatements: true)));
-
-  @override
-  int get schemaVersion => 1;
-}
 
 @UseDao(tables: [SalesmanTable])
 class SalesmanDao extends DatabaseAccessor<AppDatabase>
@@ -150,11 +141,12 @@ class SalesmanDao extends DatabaseAccessor<AppDatabase>
       select(salesmanTable).get();
 
   Stream<List<SalesmanTableData>> watchAllSalesman() =>
-      select(salesmanTable).watch();
+      (select(salesmanTable)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
 
   Future insertSalesman(SalesmanTableCompanion salesman) =>
       into(salesmanTable).insert(salesman);
 }
+
 
 @UseDao(tables: [ProductsTable])
 class ProductsDao extends DatabaseAccessor<AppDatabase>
@@ -181,4 +173,17 @@ class OrderWithFacts {
     required this.order,
     required this.fact,
   });
+}
+
+
+@UseMoor(
+    tables: [SalesmanTable, ProductsTable, OrdersTable, FactTable],
+    daos: [SalesmanDao, ProductsDao, FactTableDao, OrdersTableDao])
+class AppDatabase extends _$AppDatabase {
+  AppDatabase()
+      : super((FlutterQueryExecutor.inDatabaseFolder(
+      path: 'db.sqlite', logStatements: true)));
+
+  @override
+  int get schemaVersion => 1;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:project/domain/model/fact.dart';
 import 'package:project/database/database.dart';
 import 'package:project/presenter/bloc/fact_bloc/fact_bloc.dart';
@@ -9,6 +10,8 @@ import 'package:project/presenter/bloc/orders_bloc/orders_bloc.dart';
 import 'package:project/presenter/bloc/orders_bloc/orders_event.dart';
 import 'package:project/presenter/bloc/orders_bloc/orders_state.dart';
 import 'package:uuid/uuid.dart';
+
+import 'bottom_dialog_item.dart';
 
 class BottomDialog extends StatefulWidget {
   final List<Fact> factList;
@@ -28,6 +31,7 @@ class _BottomDialogState extends State<BottomDialog> {
   late FactBloc factBloc;
   var uuid = Uuid().v4();
   double totalCost = 0;
+  final dateFormat = DateFormat('dd/MM/yyyy');
 
   @override
   void initState() {
@@ -70,7 +74,7 @@ class _BottomDialogState extends State<BottomDialog> {
                         unityPrice: i.unityPrice,
                         productId: i.productId,
                         salesmanId: widget.salesman!.id,
-                        date: widget.date!,
+                        date: dateFormat.parse(widget.date!),
                         orderId: uuid,
                         quantity: i.quantity,
                       );
@@ -82,7 +86,7 @@ class _BottomDialogState extends State<BottomDialog> {
                       id: uuid,
                       totalCost: totalCost,
                       status: 'Open',
-                      date: widget.date!,
+                      date: dateFormat.parse(widget.date!),
 
                     );
 
@@ -178,46 +182,6 @@ class BottomDialogHeader extends StatelessWidget {
           Text(
             'remove',
             style: TextStyle(color: Colors.transparent),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class BottomDialogItem extends StatefulWidget {
-  final Fact fact;
-  final List<Fact> factList;
-  final VoidCallback onTap;
-
-  const BottomDialogItem(
-      {Key? key,
-      required this.fact,
-      required this.factList,
-      required this.onTap})
-      : super(key: key);
-
-  @override
-  _BottomDialogItemState createState() => _BottomDialogItemState();
-}
-
-class _BottomDialogItemState extends State<BottomDialogItem> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(widget.fact.productName),
-          Text(widget.fact.quantity.toString()),
-          Text(widget.fact.totalPrice.toString()),
-          GestureDetector(
-            onTap: widget.onTap,
-            child: Text(
-              'remove',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
           )
         ],
       ),

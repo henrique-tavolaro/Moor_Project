@@ -88,7 +88,7 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: [
-                    StreamB(),
+                    SalesmanList(),
                   ],
                 ),
               ),
@@ -103,14 +103,14 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
   }
 }
 
-class StreamB extends StatefulWidget {
-  const StreamB({Key? key}) : super(key: key);
+class SalesmanList extends StatefulWidget {
+  const SalesmanList({Key? key}) : super(key: key);
 
   @override
-  _StreamBState createState() => _StreamBState();
+  _SalesmanListState createState() => _SalesmanListState();
 }
 
-class _StreamBState extends State<StreamB> {
+class _SalesmanListState extends State<SalesmanList> {
   @override
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<SalesmanBloc>(context).dao.watchAllSalesman();

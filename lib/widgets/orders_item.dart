@@ -1,14 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project/database/database.dart';
 
 class OrderItem extends StatelessWidget {
   final OrdersTableData order;
-
   const OrderItem({Key? key, required this.order,}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    DateFormat dateFormat = DateFormat('dd/MM/yyyy');
     return ListTile(
       leading: Column(
         children: [
@@ -28,7 +29,7 @@ class OrderItem extends StatelessWidget {
       ),
       title: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Text('Date: ${order.date}'),
+        child: Text('Date: ${dateFormat.format(order.date)}'),
       ),
       subtitle: Padding(
         padding: const EdgeInsets.only(bottom: 8.0, left: 8),

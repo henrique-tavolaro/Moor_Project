@@ -57,7 +57,9 @@ class BodyContent extends StatelessWidget {
                 HomePageCard(
                   cardName: 'Dashboard',
                   icon: Icons.multiline_chart,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/dashboard_page');
+                  },
                 ),
               ],
             ),

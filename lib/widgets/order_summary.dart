@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project/database/database.dart';
 
 class OrderSummary extends StatefulWidget {
@@ -35,6 +36,8 @@ class OrderSummaryHeader extends StatefulWidget {
 }
 
 class _OrderSummaryHeaderState extends State<OrderSummaryHeader> {
+  final dateFormat = DateFormat('dd/MM/yyyy');
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,6 +46,7 @@ class _OrderSummaryHeaderState extends State<OrderSummaryHeader> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Total: ${widget.orderWithFacts.order.totalCost} \$CAD'),
+            Text('Date: ${dateFormat.format(widget.orderWithFacts.order.date)}'),
             Text('Status: ${widget.orderWithFacts.order.status}')
           ],
         ),
