@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
 import 'package:project/domain/model/salesman.dart';
@@ -16,15 +17,8 @@ class InsertSalesmanPage extends StatefulWidget {
 }
 
 class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
-  late SalesmanBloc salesmanBloc;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController subsidiaryController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    salesmanBloc = BlocProvider.of<SalesmanBloc>(context);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +49,6 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
                         labelText: 'Salesman name',
                         fillColor: Colors.white,
                         filled: true
-
                     ),
                   ),
                   Padding(
@@ -73,11 +66,7 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: ElevatedButton(
                       onPressed: () {
-                        final salesman = SalesmanTableCompanion.insert(
-                          name: nameController.text,
-                          subsidiary: subsidiaryController.text,
-                        );
-                        salesmanBloc.add(InsertSalesmanEvent(salesman));
+                        addSalesman();
                       },
                       child: Text('Add salesman'),
                     ),
@@ -92,14 +81,22 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
                   ],
                 ),
               ),
-
-              // BlocWidget()
-
             ],
           ),
         ),
       ),
     );
+  }
+
+  void addSalesman() {
+    final salesman = SalesmanTableCompanion.insert(
+      name: nameController.text,
+      subsidiary: subsidiaryController.text,
+    );
+    GetIt.I<SalesmanBloc>().add(InsertSalesmanEvent(salesman));
+    setState(() {});
+    nameController.text = '';
+    subsidiaryController.text = '';
   }
 }
 
@@ -113,7 +110,7 @@ class SalesmanList extends StatefulWidget {
 class _SalesmanListState extends State<SalesmanList> {
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<SalesmanBloc>(context).dao.watchAllSalesman();
+    final bloc = GetIt.I<SalesmanBloc>().dao.watchAllSalesman();
     return StreamBuilder<List<SalesmanTableData>>(
 
       stream: bloc,
@@ -135,7 +132,7 @@ class _SalesmanListState extends State<SalesmanList> {
                   leading: CircleAvatar(
                     radius: 25,
                     child: Text(
-                      '${salesman.name[0]}',
+                      '${salesman.name[0].toUpperCase()}',
                       style: TextStyle(fontSize: 28),
                     ),
                     backgroundColor: AppColors.primaryDark,

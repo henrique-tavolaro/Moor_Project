@@ -33,6 +33,8 @@ dependencies:
   intl:
   moor_inspector:
   fluttertoast:
+  charts_flutter:
+  get_it:
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:project/domain/model/fact.dart';
 import 'package:project/database/database.dart';
@@ -27,32 +28,34 @@ class BottomDialog extends StatefulWidget {
 }
 
 class _BottomDialogState extends State<BottomDialog> {
-  late OrdersBloc ordersBloc;
-  late FactBloc factBloc;
+  // late OrdersBloc ordersBloc;
+  // late FactBloc factBloc;
   var uuid = Uuid().v4();
   double totalCost = 0;
   final dateFormat = DateFormat('dd/MM/yyyy');
 
-  @override
-  void initState() {
-    factBloc = BlocProvider.of<FactBloc>(context);
-    ordersBloc = BlocProvider.of<OrdersBloc>(context);
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   factBloc = BlocProvider.of<FactBloc>(context);
+  //   ordersBloc = BlocProvider.of<OrdersBloc>(context);
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
     for (Fact i in widget.factList) {
       totalCost = totalCost + i.totalPrice;
     }
-    return BlocListener<OrdersBloc, OrdersState>(
-      listener: (context, state){
-        if(state is InsertSuccessState) {
-          final snackBar = SnackBar(content: Text('Order registered'), duration: Duration(seconds: 1),);
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-      },
-      child: Padding(
+    return
+      // BlocListener<OrdersBloc, OrdersState>(
+      // listener: (context, state){
+      //   if(state is InsertSuccessState) {
+      //     final snackBar = SnackBar(content: Text('Order registered'), duration: Duration(seconds: 1),);
+      //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      //   }
+      // },
+      // child:
+    Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
@@ -79,7 +82,7 @@ class _BottomDialogState extends State<BottomDialog> {
                         quantity: i.quantity,
                       );
 
-                      factBloc.add(InsertFactEvent(fact));
+                      GetIt.I<FactBloc>().add(InsertFactEvent(fact));
                     }
 
                     final OrdersTableData order = OrdersTableData(
@@ -90,7 +93,7 @@ class _BottomDialogState extends State<BottomDialog> {
 
                     );
 
-                    ordersBloc.add(InsertOrdersEvent(order));
+                    GetIt.I<OrdersBloc>().add(InsertOrdersEvent(order));
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
@@ -152,7 +155,7 @@ class _BottomDialogState extends State<BottomDialog> {
             ),
           ],
         ),
-      ),
+      // ),
     );
   }
 }

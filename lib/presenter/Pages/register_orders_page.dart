@@ -1,5 +1,4 @@
 import 'dart:core';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -7,12 +6,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
 import 'package:project/domain/model/fact.dart';
-import 'package:project/presenter/bloc/fact_bloc/fact_bloc.dart';
-import 'package:project/presenter/bloc/orders_bloc/orders_bloc.dart';
 import 'package:project/presenter/bloc/product_bloc/product_bloc.dart';
 import 'package:project/presenter/bloc/product_bloc/product_event.dart';
 import 'package:project/presenter/bloc/product_bloc/product_state.dart';
@@ -31,22 +29,13 @@ class RegisterOrdersPage extends StatefulWidget {
 }
 
 class _RegisterOrdersPageState extends State<RegisterOrdersPage> {
-  late SalesmanBloc salesmanBloc;
-  late ProductsBloc productsBloc;
-  late OrdersBloc ordersBloc;
-  late FactBloc factBloc;
   List<Fact> factList = [];
 
   @override
   void initState() {
-    salesmanBloc = BlocProvider.of<SalesmanBloc>(context);
-    salesmanBloc.add(GetAllSalesmanEvent());
+    GetIt.I<SalesmanBloc>().add(GetAllSalesmanEvent());
 
-    productsBloc = BlocProvider.of<ProductsBloc>(context);
-    productsBloc.add(GetAllProductsEvent());
-
-    factBloc = BlocProvider.of<FactBloc>(context);
-    ordersBloc = BlocProvider.of<OrdersBloc>(context);
+    GetIt.I<ProductsBloc>().add(GetAllProductsEvent());
     super.initState();
   }
 
@@ -96,25 +85,27 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           GestureDetector(
-                              onTap: () async {
-                                String dateFormatted = await datePicker(context);
-                                dateController.text = dateFormatted.toString();
-                                setState(() {});
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: Colors.white,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 12),
+                            onTap: () async {
+                              String dateFormatted = await datePicker(context);
+                              dateController.text = dateFormatted.toString();
+                              setState(() {});
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                child: Expanded(
                                   child: Row(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 16),
-                                        child:
-                                            Icon(Icons.calendar_today, size: 22),
+                                        padding:
+                                            const EdgeInsets.only(right: 16),
+                                        child: Icon(Icons.calendar_today,
+                                            size: 22),
                                       ),
                                       Text(
                                         dateController.text.isEmpty
@@ -127,7 +118,9 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
                                     ],
                                   ),
                                 ),
-                              ))
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -157,10 +150,15 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
                             text: 'Order Summary',
                             color: AppColors.secondary,
                           ),
-                          BlocBuilder<SalesmanBloc, SalesmanStateBloc>(
-                            builder: (context, state) {
-                              if (state is GetSalesmanSuccessState) {
-                                return salesmanDropdown(state);
+                          StreamBuilder<List<SalesmanTableData>>(
+                            stream:
+                                GetIt.I<SalesmanBloc>().dao.watchAllSalesman(),
+                            builder: (context,
+                                AsyncSnapshot<List<SalesmanTableData>>
+                                    snapshot) {
+                              final salesmanList = snapshot.data ?? [];
+                              if (salesmanList.isNotEmpty) {
+                                return salesmanDropdown(salesmanList);
                               } else {
                                 return Text('no salesman');
                               }
@@ -177,29 +175,32 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
               height: 30,
             ),
             Card(
-              child: BlocBuilder<ProductsBloc, ProductsState>(
-                builder: (context, state) {
-                  if (state is GetSuccessState) {
-                    final list = state.productsList;
+              child: StreamBuilder<List<ProductsTableData>>(
+                stream: GetIt.I<ProductsBloc>().dao.watchAllProducts(),
+                builder:
+                    (context, AsyncSnapshot<List<ProductsTableData>> snapshot) {
+                  final productsList = snapshot.data ?? [];
+
+                  if (productsList.isNotEmpty) {
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount: list.length,
+                      itemCount: productsList.length,
                       itemBuilder: (context, index) {
                         if (index == 0) {
                           return Column(
                             children: [
                               Header(),
                               Item(
-                                product: list[index],
+                                product: productsList[index],
                                 factList: widget.factList,
                               )
                             ],
                           );
                         }
                         return Item(
-                          product: list[index],
+                          product: productsList[index],
                           factList: widget.factList,
                         );
                       },
@@ -216,11 +217,9 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
     );
   }
 
-  Container salesmanDropdown(GetSalesmanSuccessState state) {
-     final list = state.salesmanList;
-    DropdownMenuItem<SalesmanTableData>
-        dropdownFromSalesman(
-            SalesmanTableData salesman) {
+  Container salesmanDropdown(List<SalesmanTableData> salesmanList) {
+    DropdownMenuItem<SalesmanTableData> dropdownFromSalesman(
+        SalesmanTableData salesman) {
       return DropdownMenuItem(
         value: salesman,
         child: RegisterOrdersChips(
@@ -229,11 +228,9 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
         ),
       );
     }
-    
-    final dropdownMenuItems = list
-        .map((salesman) =>
-            dropdownFromSalesman(salesman))
-        .toList()
+
+    final dropdownMenuItems =
+        salesmanList.map((salesman) => dropdownFromSalesman(salesman)).toList()
           ..insert(
             0,
             DropdownMenuItem(
@@ -245,7 +242,7 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
                   child: Text('select salesman')),
             ),
           );
-    
+
     return Container(
       width: 200,
       padding: EdgeInsets.only(right: 24),
@@ -269,7 +266,7 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
   }
 
   void toast(String message) {
-      Fluttertoast.showToast(
+    Fluttertoast.showToast(
         msg: message,
         textColor: Colors.black,
         toastLength: Toast.LENGTH_SHORT,

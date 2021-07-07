@@ -1,13 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:project/database/database.dart';
 import 'package:project/presenter/bloc/orders_bloc/orders_bloc.dart';
 import 'package:project/presenter/bloc/orders_bloc/orders_event.dart';
-import 'package:project/presenter/bloc/orders_bloc/orders_state.dart';
-import 'package:project/widgets/bottom_dialog.dart';
 import 'package:project/widgets/order_summary.dart';
 import 'package:project/widgets/orders_item.dart';
 
@@ -19,7 +17,7 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  String dropdownValue = 'All orders';
+  String dropdownValue = OrderStatus.AllOrders.status;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +33,12 @@ class _OrdersPageState extends State<OrdersPage> {
                 dropdownValue = newValue!;
               });
             },
-            items: <String>[OrderStatus.AllOrders.status, OrderStatus.Open.status, OrderStatus.Closed.status, OrderStatus.Canceled.status, ]
-                .map<DropdownMenuItem<String>>(
+            items: <String>[
+              OrderStatus.AllOrders.status,
+              OrderStatus.Open.status,
+              OrderStatus.Closed.status,
+              OrderStatus.Canceled.status,
+            ].map<DropdownMenuItem<String>>(
               (String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -67,14 +69,12 @@ class OrdersBody extends StatefulWidget {
 }
 
 class _OrdersBodyState extends State<OrdersBody> {
-  late OrdersBloc ordersBloc;
   final controller = ScrollController();
   String query = '';
 
   @override
   void initState() {
-    ordersBloc = BlocProvider.of<OrdersBloc>(context);
-    ordersBloc.add(GetAllOrdersEvent());
+    GetIt.I<OrdersBloc>().add(GetAllOrdersEvent());
     super.initState();
   }
 
@@ -94,139 +94,113 @@ class _OrdersBodyState extends State<OrdersBody> {
                 child: Column(
                   children: [
                     StreamBuilder(
-                        stream: BlocProvider.of<OrdersBloc>(context)
-                            .dao
-                            .getOrderWithFacts(query),
+                        stream:
+                            GetIt.I<OrdersBloc>().dao.getOrderWithFacts(query),
                         builder: (context,
                             AsyncSnapshot<List<OrderWithFacts>> snapshot) {
                           final list = snapshot.data ?? [];
 
                           if (list.isNotEmpty) {
-                            return BlocListener<OrdersBloc, OrdersState>(
-                              listener: (context, state) {
-                                if (state is UpdateState) {
-                                  final OrdersTableData orderUndo =
-                                      OrdersTableData(
-                                    id: list[0].order.id,
-                                    status: 'Open',
-                                    totalCost: list[0].order.totalCost,
-                                    date: list[0].order.date,
-                                  );
-                                  final snackBar = SnackBar(
-                                    content: Text('Order updated'),
-                                    duration: Duration(seconds: 6),
-                                    action: SnackBarAction(
-                                      label: 'Undo',
-                                      onPressed: () {
-                                        ordersBloc
-                                            .add(UpdateOrderEvent(orderUndo));
-                                      },
-                                    ),
-                                  );
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(snackBar);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            if (list[0].order.status !=
-                                                'Open') {
-                                              Fluttertoast.showToast(
-                                                  msg:
-                                                      'This order was ${list[0].order.status}',
-                                                  textColor: Colors.black,
-                                                  toastLength:
-                                                      Toast.LENGTH_SHORT,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                  backgroundColor: Colors.white,
-                                                  timeInSecForIosWeb: 3);
-                                            } else {
-                                              final OrdersTableData order =
-                                                  OrdersTableData(
-                                                id: list[0].order.id,
-                                                status: 'Canceled',
-                                                totalCost:
-                                                    list[0].order.totalCost,
-                                                date: list[0].order.date,
-                                              );
-                                              ordersBloc
-                                                  .add(UpdateOrderEvent(order));
-                                            }
-                                          },
-                                          child: Text('Cancel Order'),
-                                          style: ElevatedButton.styleFrom(
-                                              primary:
-                                                  list[0].order.status != 'Open'
-                                                      ? Colors.grey
-                                                      : Colors.red),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            if (list[0].order.status !=
-                                                'Open') {
-                                              Fluttertoast.showToast(
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          if (list[0].order.status != 'Open') {
+                                            Fluttertoast.showToast(
                                                 msg:
                                                     'This order was ${list[0].order.status}',
                                                 textColor: Colors.black,
                                                 toastLength: Toast.LENGTH_SHORT,
                                                 gravity: ToastGravity.BOTTOM,
                                                 backgroundColor: Colors.white,
-                                                timeInSecForIosWeb: 3,
-                                              );
-                                            } else {
-                                              final OrdersTableData order =
-                                                  OrdersTableData(
-                                                id: list[0].order.id,
-                                                status: 'Closed',
-                                                totalCost:
-                                                    list[0].order.totalCost,
-                                                date: list[0].order.date,
-                                              );
-                                              ordersBloc
-                                                  .add(UpdateOrderEvent(order));
-                                            }
-                                          },
-                                          child: Text('Close Order'),
-                                          style: ElevatedButton.styleFrom(
-                                              primary:
-                                                  list[0].order.status != 'Open'
-                                                      ? Colors.grey
-                                                      : Colors.blue),
-                                        ),
-                                      ],
-                                    ),
+                                                timeInSecForIosWeb: 3);
+                                          } else {
+                                            final OrdersTableData order =
+                                                OrdersTableData(
+                                              id: list[0].order.id,
+                                              status: 'Canceled',
+                                              totalCost:
+                                                  list[0].order.totalCost,
+                                              date: list[0].order.date,
+                                            );
+                                            GetIt.I<OrdersBloc>()
+                                                .add(UpdateOrderEvent(order));
+                                            setState(() {});
+                                            undoSnackbar(list, context);
+                                          }
+                                        },
+                                        child: Text('Cancel Order'),
+                                        style: ElevatedButton.styleFrom(
+                                            primary:
+                                                list[0].order.status != 'Open'
+                                                    ? Colors.grey
+                                                    : Colors.red),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          if (list[0].order.status != 'Open') {
+                                            Fluttertoast.showToast(
+                                              msg:
+                                                  'This order was ${list[0].order.status}',
+                                              textColor: Colors.black,
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              backgroundColor: Colors.white,
+                                              timeInSecForIosWeb: 3,
+                                            );
+                                          } else {
+                                            final OrdersTableData order =
+                                                OrdersTableData(
+                                              id: list[0].order.id,
+                                              status: 'Closed',
+                                              totalCost:
+                                                  list[0].order.totalCost,
+                                              date: list[0].order.date,
+                                            );
+                                            GetIt.I<OrdersBloc>()
+                                                .add(UpdateOrderEvent(order));
+                                            setState(() {});
+                                            undoSnackbar(list, context);
+                                          }
+                                        },
+                                        child: Text('Close Order'),
+                                        style: ElevatedButton.styleFrom(
+                                            primary:
+                                                list[0].order.status != 'Open'
+                                                    ? Colors.grey
+                                                    : Colors.blue),
+                                      ),
+                                    ],
                                   ),
-                                  ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount: list.length,
-                                    itemBuilder: (context, index) {
-                                      if (index == 0) {
-                                        return Column(
-                                          children: [
-                                            OrderSummaryHeader(
-                                                orderWithFacts: list[0]),
-                                            OrderSummary(
-                                                orderWithFact: list[index])
-                                          ],
-                                        );
-                                      }
-                                      return OrderSummary(
-                                          orderWithFact: list[index]);
-                                    },
-                                  ),
-                                ],
-                              ),
+                                ),
+                                ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount: list.length,
+                                  itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return Column(
+                                        children: [
+                                          OrderSummaryHeader(
+                                              orderWithFacts: list[0]),
+                                          OrderSummary(
+                                              orderWithFact: list[index])
+                                        ],
+                                      );
+                                    }
+                                    return OrderSummary(
+                                        orderWithFact: list[index]);
+                                  },
+                                ),
+                              ],
+                              // ),
                             );
                           } else {
                             return Text('vazio');
@@ -244,20 +218,12 @@ class _OrdersBodyState extends State<OrdersBody> {
                 width: double.maxFinite,
                 child: StreamBuilder<List<OrdersTableData>>(
                   stream: widget.dropdownValue == 'All orders'
-                      ? BlocProvider.of<OrdersBloc>(context)
-                          .dao
-                          .watchAllOrders()
+                      ? GetIt.I<OrdersBloc>().dao.watchAllOrders()
                       : widget.dropdownValue == 'Open'
-                          ? BlocProvider.of<OrdersBloc>(context)
-                              .dao
-                              .watchOpenOrders()
+                          ? GetIt.I<OrdersBloc>().dao.watchOpenOrders()
                           : widget.dropdownValue == 'Closed'
-                              ? BlocProvider.of<OrdersBloc>(context)
-                                  .dao
-                                  .watchClosedOrders()
-                              : BlocProvider.of<OrdersBloc>(context)
-                                  .dao
-                                  .watchCanceledOrders(),
+                              ? GetIt.I<OrdersBloc>().dao.watchClosedOrders()
+                              : GetIt.I<OrdersBloc>().dao.watchCanceledOrders(),
                   builder:
                       (context, AsyncSnapshot<List<OrdersTableData>> snapshot) {
                     final ordersList = snapshot.data ?? [];
@@ -300,6 +266,27 @@ class _OrdersBodyState extends State<OrdersBody> {
     );
   }
 
+  void undoSnackbar(List<OrderWithFacts> list, BuildContext context) {
+    final OrdersTableData orderUndo = OrdersTableData(
+      id: list[0].order.id,
+      status: 'Open',
+      totalCost: list[0].order.totalCost,
+      date: list[0].order.date,
+    );
+    final snackBar = SnackBar(
+      content: Text('Order updated'),
+      duration: Duration(seconds: 6),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () {
+          GetIt.I<OrdersBloc>().add(UpdateOrderEvent(orderUndo));
+          setState(() {});
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void _scrollToTop() {
     controller.animateTo(0,
         duration: Duration(seconds: 1), curve: Curves.fastLinearToSlowEaseIn);
@@ -321,7 +308,6 @@ extension OrderStatusExtension on OrderStatus {
       case OrderStatus.Open:
         return 'Open';
       case OrderStatus.Closed:
-        // TODO: Handle this case.
         return 'Closed';
       case OrderStatus.Canceled:
         return 'Canceled';

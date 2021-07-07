@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:get_it/get_it.dart';
 import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
 import 'package:project/presenter/bloc/product_bloc/product_bloc.dart';
@@ -15,19 +16,12 @@ class InsertProductsPage extends StatefulWidget {
 }
 
 class _InsertProductsPageState extends State<InsertProductsPage> {
-  late ProductsBloc productsBloc;
   final TextEditingController nameController = TextEditingController();
   final priceController = MoneyMaskedTextController(
     decimalSeparator: ',',
     thousandSeparator: '.',
     rightSymbol: '\$CAD',
   );
-
-  @override
-  void initState() {
-    super.initState();
-    productsBloc = BlocProvider.of<ProductsBloc>(context);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +67,8 @@ class _InsertProductsPageState extends State<InsertProductsPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    final product = ProductsTableCompanion.insert(
-                      productName: nameController.text,
-                      price: priceController.numberValue,
-                    );
-                    productsBloc.add(InsertProductEvent(product));
+                    addProduct();
+
                   },
                   child: Text('Add product'),
                 ),
@@ -88,6 +79,17 @@ class _InsertProductsPageState extends State<InsertProductsPage> {
         ),
       ),
     );
+  }
+
+  void addProduct() {
+    final product = ProductsTableCompanion.insert(
+      productName: nameController.text,
+      price: priceController.numberValue,
+    );
+    GetIt.I<ProductsBloc>().add(InsertProductEvent(product));
+    setState(() {});
+    priceController.text = '';
+    nameController.text = '';
   }
 }
 
@@ -101,7 +103,7 @@ class ProductsList extends StatefulWidget {
 class _ProductsListState extends State<ProductsList> {
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<ProductsBloc>(context).dao.watchAllProducts();
+    final bloc = GetIt.I<ProductsBloc>().dao.watchAllProducts();
     return StreamBuilder<List<ProductsTableData>>(
       stream: bloc,
       builder: (context, AsyncSnapshot<List<ProductsTableData>> snapshot) {
