@@ -13,19 +13,27 @@ class FactBloc extends Bloc<FactEvent, FactState> {
 
   @override
   Stream<FactState> mapEventToState(FactEvent event) async* {
-    if(event is InsertFactEvent){
-      try{
+    if (event is InsertFactEvent) {
+      try {
         await dao.insertFact(event.fact);
         yield InsertSuccessState(event.fact);
-      } catch(e){
+      } catch (e) {
         ErrorState(e.toString());
       }
     }
-    if(event is GetAllFactsEvent){
-      try{
+    if (event is GetAllFactsEvent) {
+      try {
         final list = await dao.getAllFacts();
         yield GetSuccessState(list);
-      } catch(e) {
+      } catch (e) {
+        yield ErrorState(e.toString());
+      }
+    }
+    if (event is GetSalesBySalesman) {
+      try {
+        final list = await dao.salesBySalesman().watch();
+        yield SalesBySalesmanState(list);
+      } catch (e) {
         yield ErrorState(e.toString());
       }
     }

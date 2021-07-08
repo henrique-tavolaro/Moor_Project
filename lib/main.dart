@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moor_inspector/moor_inspector.dart';
-import 'package:project/database/database.dart';
-import 'package:project/presenter/bloc/fact_bloc/fact_bloc.dart';
-import 'package:project/presenter/bloc/orders_bloc/orders_bloc.dart';
-import 'package:project/presenter/bloc/product_bloc/product_bloc.dart';
-import 'package:project/presenter/bloc/salesman_bloc/salesman_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'AppWidget.dart';
 

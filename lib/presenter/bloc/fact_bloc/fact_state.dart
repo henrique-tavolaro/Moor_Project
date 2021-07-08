@@ -1,3 +1,4 @@
+import 'package:moor/moor.dart';
 import 'package:project/database/database.dart';
 import 'package:equatable/equatable.dart';
 
@@ -38,5 +39,15 @@ class GetSuccessState extends FactState {
   @override
   // TODO: implement props
   List<Object?> get props => throw UnimplementedError();
+}
 
+
+class SalesBySalesmanState extends FactState {
+  final Stream<List<SalesBySalesmanResult>> list;
+
+  SalesBySalesmanState(this.list);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
 }

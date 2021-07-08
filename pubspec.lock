@@ -190,13 +190,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
-  dart_service_announcement:
-    dependency: transitive
-    description:
-      name: dart_service_announcement
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   dart_style:
     dependency: transitive
     description:
@@ -374,7 +367,7 @@ packages:
     source: hosted
     version: "1.0.0"
   moor:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: moor
       url: "https://pub.dartlang.org"
@@ -394,13 +387,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.3.2"
-  moor_inspector:
-    dependency: "direct main"
-    description:
-      name: moor_inspector
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
   nested:
     dependency: transitive
     description:

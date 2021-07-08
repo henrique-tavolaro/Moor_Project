@@ -28,34 +28,16 @@ class BottomDialog extends StatefulWidget {
 }
 
 class _BottomDialogState extends State<BottomDialog> {
-  // late OrdersBloc ordersBloc;
-  // late FactBloc factBloc;
   var uuid = Uuid().v4();
   double totalCost = 0;
   final dateFormat = DateFormat('dd/MM/yyyy');
-
-  // @override
-  // void initState() {
-  //   factBloc = BlocProvider.of<FactBloc>(context);
-  //   ordersBloc = BlocProvider.of<OrdersBloc>(context);
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
     for (Fact i in widget.factList) {
       totalCost = totalCost + i.totalPrice;
     }
-    return
-      // BlocListener<OrdersBloc, OrdersState>(
-      // listener: (context, state){
-      //   if(state is InsertSuccessState) {
-      //     final snackBar = SnackBar(content: Text('Order registered'), duration: Duration(seconds: 1),);
-      //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      //   }
-      // },
-      // child:
-    Padding(
+    return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [

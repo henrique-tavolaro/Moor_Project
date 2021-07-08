@@ -28,10 +28,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   equatable:
   uuid:
-  moor:
   flutter_masked_text2: ^0.9.1
   intl:
-  moor_inspector:
   fluttertoast:
   charts_flutter:
   get_it:

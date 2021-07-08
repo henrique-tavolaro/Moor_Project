@@ -127,25 +127,30 @@ class _SalesmanListState extends State<SalesmanList> {
               final salesman = salesmanList[index];
               return Card(
                 elevation: 2,
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(8),
-                  leading: CircleAvatar(
-                    radius: 25,
-                    child: Text(
-                      '${salesman.name[0].toUpperCase()}',
-                      style: TextStyle(fontSize: 28),
+                child: GestureDetector(
+                  onTap: () {
+                    print(salesman);
+                  },
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(8),
+                    leading: CircleAvatar(
+                      radius: 25,
+                      child: Text(
+                        '${salesman.name[0].toUpperCase()}',
+                        style: TextStyle(fontSize: 28),
+                      ),
+                      backgroundColor: AppColors.primaryDark,
                     ),
-                    backgroundColor: AppColors.primaryDark,
-                  ),
-                  title: Text(
-                    salesman.name,
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  subtitle: Text(
-                    salesman.subsidiary,
-                    style: TextStyle(fontSize: 18),
-                  ),
+                    title: Text(
+                      salesman.name,
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    subtitle: Text(
+                      salesman.subsidiary,
+                      style: TextStyle(fontSize: 18),
+                    ),
 
+                  ),
                 ),
               );
             },

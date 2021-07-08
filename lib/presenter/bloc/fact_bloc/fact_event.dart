@@ -22,3 +22,15 @@ class GetAllFactsEvent extends FactEvent {
   List<Object?> get props => throw UnimplementedError();
 
 }
+
+class GetSalesBySalesman extends FactEvent {
+
+  GetSalesBySalesman();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+
+
+}
