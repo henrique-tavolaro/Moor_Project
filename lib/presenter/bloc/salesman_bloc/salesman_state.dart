@@ -1,7 +1,6 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:project/database/database.dart';
-import 'package:project/domain/model/salesman.dart';
 
 abstract class SalesmanStateBloc extends Equatable{}
 
@@ -37,6 +36,16 @@ class GetSalesmanSuccessState extends SalesmanStateBloc {
   final List<SalesmanTableData> salesmanList;
 
   GetSalesmanSuccessState(this.salesmanList);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+}
+
+class DeleteSalesmanSuccessState extends SalesmanStateBloc {
+
+  DeleteSalesmanSuccessState();
 
   @override
   // TODO: implement props

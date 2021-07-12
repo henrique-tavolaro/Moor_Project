@@ -88,7 +88,7 @@ class _InsertProductsPageState extends State<InsertProductsPage> {
     );
     GetIt.I<ProductsBloc>().add(InsertProductEvent(product));
     setState(() {});
-    priceController.text = '';
+    priceController.clear();
     nameController.text = '';
   }
 }
@@ -117,27 +117,34 @@ class _ProductsListState extends State<ProductsList> {
             itemCount: productsList.length,
             itemBuilder: (_, index) {
               final product = productsList[index];
-              return Card(
-                elevation: 2,
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(8),
-                  leading: CircleAvatar(
-                    radius: 25,
-                    child: Text(
-                      '${product.productName[0].toUpperCase()}',
-                      style: TextStyle(fontSize: 28),
+              return Dismissible(
+                key: Key(product.productName),
+                onDismissed: (direction) {
+                  GetIt.I<ProductsBloc>().add(DeleteProductEvent(product));
+                },
+                background: Container(color: Colors.red,),
+                child: Card(
+                  elevation: 2,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(8),
+                    leading: CircleAvatar(
+                      radius: 25,
+                      child: Text(
+                        '${product.productName[0].toUpperCase()}',
+                        style: TextStyle(fontSize: 28),
+                      ),
+                      backgroundColor: AppColors.primaryDark,
                     ),
-                    backgroundColor: AppColors.primaryDark,
-                  ),
-                  title: Text(
-                    product.productName,
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  subtitle: Text(
-                    '${product.price.toString()} \$CAD',
-                    style: TextStyle(fontSize: 18),
-                  ),
+                    title: Text(
+                      product.productName,
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    subtitle: Text(
+                      '${product.price.toString()} \$CAD',
+                      style: TextStyle(fontSize: 18),
+                    ),
 
+                  ),
                 ),
               );
             },

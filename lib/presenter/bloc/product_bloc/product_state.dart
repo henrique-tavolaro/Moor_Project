@@ -40,3 +40,14 @@ class GetSuccessState extends ProductsState {
   List<Object?> get props => throw UnimplementedError();
 
 }
+
+class DeleteProductSuccessState extends ProductsState {
+
+  DeleteProductSuccessState();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+
+}

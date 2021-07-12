@@ -29,13 +29,6 @@ class FactBloc extends Bloc<FactEvent, FactState> {
         yield ErrorState(e.toString());
       }
     }
-    if (event is GetSalesBySalesman) {
-      try {
-        final list = await dao.salesBySalesman().watch();
-        yield SalesBySalesmanState(list);
-      } catch (e) {
-        yield ErrorState(e.toString());
-      }
-    }
+
   }
 }

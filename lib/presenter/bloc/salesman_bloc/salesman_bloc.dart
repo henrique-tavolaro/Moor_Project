@@ -29,6 +29,15 @@ class SalesmanBloc extends Bloc<SalesmanEventBloc, SalesmanStateBloc> {
         yield ErrorState(e.toString());
       }
     }
+    if (event is DeleteSalesmanEvent) {
+      try{
+        final list = await dao.deleteSalesman(event.salesman);
+        yield DeleteSalesmanSuccessState();
+      } catch(e) {
+        yield ErrorState(e.toString());
+      }
+    }
   }
+
 
 }

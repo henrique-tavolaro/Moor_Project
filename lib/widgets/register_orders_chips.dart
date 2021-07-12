@@ -22,7 +22,7 @@ class _RegisterOrdersChipsState extends State<RegisterOrdersChips> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(10),
         color: widget.color,
       ),
       child: GestureDetector(
@@ -31,7 +31,6 @@ class _RegisterOrdersChipsState extends State<RegisterOrdersChips> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: Row(
             children: [
-
               Text(
                 widget.text,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

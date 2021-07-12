@@ -203,7 +203,7 @@ class _OrdersBodyState extends State<OrdersBody> {
                               // ),
                             );
                           } else {
-                            return Text('vazio');
+                            return Text('No order selected');
                           }
                         })
                   ],
@@ -318,3 +318,30 @@ extension OrderStatusExtension on OrderStatus {
     }
   }
 }
+
+
+
+// Row(
+//   mainAxisAlignment: MainAxisAlignment.spaceAround,
+//   children: [
+//     ElevatedButton(onPressed: () async {
+//     before = (await showDatePicker(
+//           context: context,
+//           initialDate: DateTime.now(),
+//           firstDate: DateTime(2021),
+//           lastDate: DateTime(2030),
+//         ))!;
+//         print(before.toString());
+//       }
+//     , child: Text('BEFORE')),
+//     ElevatedButton(onPressed: () async {
+//       after = (await showDatePicker(
+//         context: context,
+//         initialDate: DateTime.now(),
+//         firstDate: DateTime(2021),
+//         lastDate: DateTime(2030),
+//       ))!;
+//       print(after.toString());
+//     }, child: Text('AFTER'))
+//   ],
+// ),

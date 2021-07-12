@@ -51,6 +51,14 @@ class FactTable extends Table {
 
   DateTimeColumn get date => dateTime()();
 
+  TextColumn get year => text()();
+
+  TextColumn get month => text()();
+
+  IntColumn get monthNum => integer()();
+
+  TextColumn get day => text()();
+
   TextColumn get salesmanId => text()();
 
   TextColumn get productId => text()();
@@ -66,10 +74,32 @@ class FactTable extends Table {
 
 @UseDao(tables: [
   FactTable,
-  SalesmanTable
+  SalesmanTable,
+  OrdersTable
 ], queries: {
-  'salesBySalesman':
-  'SELECT salesman_id, COUNT(*) FROM fact_Table GROUP BY salesman_id;'
+  'salesBySalesman': 'SELECT '
+      'b.name, '
+      'a.total_price '
+      'FROM fact_Table a '
+      'JOIN salesman_table b '
+      'ON a.salesman_id = b.id '
+      'WHERE month = ? '
+      'GROUP BY b.name;',
+  'salesByProduct':
+      'SELECT '
+          'product_name, '
+          'SUM(total_price) '
+          'FROM fact_table '
+          'GROUP BY product_name;',
+  'salesByMonth':
+      'SELECT '
+          'month, '
+          'month_num, '
+          'SUM(total_price) '
+          'FROM '
+          'fact_table '
+          'GROUP BY month '
+          'ORDER BY month_num;',
 })
 class FactTableDao extends DatabaseAccessor<AppDatabase>
     with _$FactTableDaoMixin {
@@ -82,57 +112,9 @@ class FactTableDao extends DatabaseAccessor<AppDatabase>
   Stream<List<FactTableData>> watchAllFact() => select(factTable).watch();
 
   Future insertFact(FactTableCompanion fact) => into(factTable).insert(fact);
-
-  // Stream<List<SaleBySalesmanResult>> saleBySalesman(String id) {
-  //   final amount = factTable.id.count();
-  //
-  //   final query = db.selectOnly(salesmanTable).join([
-  //     innerJoin(
-  //       factTable,
-  //       factTable.salesmanId.equalsExp(salesmanTable.id),
-  //     useColumns: false)
-  //   ]);
-  //
-  //   return (query
-  //     ..addColumns([salesmanTable.id, factTable.salesmanId.count()])
-  //   ..groupBy([salesmanTable.id])).watch().map((rows) {
-  //     return rows.map((row) => SaleBySalesmanResult(
-  //         salesmanId: row.read<String>('salesman_id'),
-  //         sUMtotalPrice: row.read<int>(factTable.salesmanId.count()))).toList();
-  //   });
-
-    //
-    // return customSelect(
-    //   'SELECT salesman_id, SUM(total_price) AS c FROM fact_Table WHERE salesman_id = ? GROUP BY salesman_id',
-    //   variables: [Variable.withString(id)],
-    //   readsFrom: {factTable},
-    // ).watch().map(
-    //       (rows) {
-    //     return rows
-    //         .map(
-    //           (row) =>
-    //           SaleBySalesmanResult(
-    //             salesmanId: row.read<String>('salesman_id'),
-    //             sUMtotalPrice: row.read<double>('c'),
-    //           ),
-    //     )
-    //         .toList();
-    //   },
-    // );
-  }
-
-
-
-
-class SaleBySalesmanResult {
-  final String salesmanId;
-  final double sUMtotalPrice;
-
-  SaleBySalesmanResult({
-    required this.salesmanId,
-    required this.sUMtotalPrice,
-  });
 }
+
+
 
 @UseDao(tables: [OrdersTable, FactTable])
 class OrdersTableDao extends DatabaseAccessor<AppDatabase>
@@ -148,27 +130,23 @@ class OrdersTableDao extends DatabaseAccessor<AppDatabase>
   Future updateOrder(OrdersTableData order) =>
       update(ordersTable).replace(order);
 
-  Stream<List<OrdersTableData>> watchAllOrders() =>
-      (select(ordersTable)
+  Stream<List<OrdersTableData>> watchAllOrders() => (select(ordersTable)
         ..orderBy(
             [(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
-          .watch();
+      .watch();
 
   Stream<List<OrdersTableData>> watchOpenOrders() {
-    return (select(ordersTable)
-      ..where((tbl) => tbl.status.equals('Open')))
+    return (select(ordersTable)..where((tbl) => tbl.status.equals('Open')))
         .watch();
   }
 
   Stream<List<OrdersTableData>> watchClosedOrders() {
-    return (select(ordersTable)
-      ..where((tbl) => tbl.status.equals('Closed')))
+    return (select(ordersTable)..where((tbl) => tbl.status.equals('Closed')))
         .watch();
   }
 
   Stream<List<OrdersTableData>> watchCanceledOrders() {
-    return (select(ordersTable)
-      ..where((tbl) => tbl.status.equals('Canceled')))
+    return (select(ordersTable)..where((tbl) => tbl.status.equals('Canceled')))
         .watch();
   }
 
@@ -178,16 +156,15 @@ class OrdersTableDao extends DatabaseAccessor<AppDatabase>
     ]);
     query.where(ordersTable.id.equals(id));
     return query.watch().map(
-          (rows) =>
-          rows.map(
-                (row) {
+          (rows) => rows.map(
+            (row) {
               return OrderWithFacts(
                 order: row.readTable(ordersTable),
                 fact: row.readTable(factTable),
               );
             },
           ).toList(),
-    );
+        );
   }
 }
 
@@ -201,10 +178,11 @@ class SalesmanDao extends DatabaseAccessor<AppDatabase>
   Future<List<SalesmanTableData>> getAllSalesman() =>
       select(salesmanTable).get();
 
-  Stream<List<SalesmanTableData>> watchAllSalesman() =>
-      (select(salesmanTable)
+  Stream<List<SalesmanTableData>> watchAllSalesman() => (select(salesmanTable)
         ..orderBy([(t) => OrderingTerm(expression: t.name)]))
-          .watch();
+      .watch();
+
+  Future deleteSalesman(SalesmanTableData salesman) => delete(salesmanTable).delete(salesman);
 
   Future insertSalesman(SalesmanTableCompanion salesman) =>
       into(salesmanTable).insert(salesman);
@@ -222,6 +200,8 @@ class ProductsDao extends DatabaseAccessor<AppDatabase>
 
   Stream<List<ProductsTableData>> watchAllProducts() =>
       select(productsTable).watch();
+
+  Future deleteProduct(ProductsTableData product) => delete(productsTable).delete(product);
 
   Future insertProduct(ProductsTableCompanion product) =>
       into(productsTable).insert(product);
@@ -248,13 +228,13 @@ class SalesmanWithFacts {
 }
 
 @UseMoor(
-    tables: [SalesmanTable, ProductsTable, OrdersTable, FactTable],
-    daos: [SalesmanDao, ProductsDao, FactTableDao, OrdersTableDao],
-    )
+  tables: [SalesmanTable, ProductsTable, OrdersTable, FactTable],
+  daos: [SalesmanDao, ProductsDao, FactTableDao, OrdersTableDao],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super((FlutterQueryExecutor.inDatabaseFolder(
-      path: 'db.sqlite', logStatements: true)));
+            path: 'db.sqlite', logStatements: true)));
 
   @override
   int get schemaVersion => 1;

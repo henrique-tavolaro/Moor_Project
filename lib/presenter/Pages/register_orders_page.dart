@@ -74,107 +74,109 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
         child: Column(
           children: [
             Container(
-              height: 120,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              String dateFormatted = await datePicker(context);
-                              dateController.text = dateFormatted.toString();
-                              setState(() {});
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: Colors.white,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                                child: Expanded(
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 16),
-                                        child: Icon(Icons.calendar_today,
-                                            size: 22),
-                                      ),
-                                      Text(
-                                        dateController.text.isEmpty
-                                            ? dateFormat.format(now)
-                                            : dateController.text,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
-                                      ),
-                                    ],
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: GestureDetector(
+                              onTap: () async {
+                                String dateFormatted = await datePicker(context);
+                                dateController.text = dateFormatted.toString();
+                                setState(() {});
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                  child: Expanded(
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                          const EdgeInsets.only(right: 16),
+                                          child: Icon(Icons.calendar_today,
+                                              size: 22),
+                                        ),
+                                        Text(
+                                          dateController.text.isEmpty
+                                              ? dateFormat.format(now)
+                                              : dateController.text,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          )
-                        ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8.0),
+                            child: RegisterOrdersChips(
+                              onTap: () {
+                                if (selectedSalesman == null) {
+                                  toast('Select a salesman');
+                                } else if (widget.factList.isEmpty) {
+                                  toast('Add a product to check the summary');
+                                } else {
+                                  showBottomDialog(
+                                      context,
+                                      widget.factList,
+                                      dateController.text.isEmpty
+                                          ? dateFormat.format(now)
+                                          : dateController.text,
+                                      selectedSalesman);
+                                }
+                              },
+                              text: 'Order Summary',
+                              color: AppColors.secondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(left: 4, right: 4, top: 4, bottom: 8),
+                      width: double.maxFinite,
+                      child: StreamBuilder<List<SalesmanTableData>>(
+                        stream:
+                        GetIt.I<SalesmanBloc>().dao.watchAllSalesman(),
+                        builder: (context,
+                            AsyncSnapshot<List<SalesmanTableData>>
+                            snapshot) {
+                          final salesmanList = snapshot.data ?? [];
+                          if (salesmanList.isNotEmpty) {
+                            return salesmanDropdown(salesmanList);
+                          } else {
+                            return Text('no salesman');
+                          }
+                        },
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          RegisterOrdersChips(
-                            onTap: () {
-                              if (selectedSalesman == null) {
-                                toast('Select a salesman');
-                              } else if (widget.factList.isEmpty) {
-                                toast('Add a product to check the summary');
-                              } else {
-                                showBottomDialog(
-                                    context,
-                                    widget.factList,
-                                    dateController.text.isEmpty
-                                        ? dateFormat.format(now)
-                                        : dateController.text,
-                                    selectedSalesman);
-                              }
-                            },
-                            text: 'Order Summary',
-                            color: AppColors.secondary,
-                          ),
-                          StreamBuilder<List<SalesmanTableData>>(
-                            stream:
-                                GetIt.I<SalesmanBloc>().dao.watchAllSalesman(),
-                            builder: (context,
-                                AsyncSnapshot<List<SalesmanTableData>>
-                                    snapshot) {
-                              final salesmanList = snapshot.data ?? [];
-                              if (salesmanList.isNotEmpty) {
-                                return salesmanDropdown(salesmanList);
-                              } else {
-                                return Text('no salesman');
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+
+                ),
               ),
             ),
-            SizedBox(
-              height: 30,
-            ),
+
             Card(
+            shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),),
               child: StreamBuilder<List<ProductsTableData>>(
                 stream: GetIt.I<ProductsBloc>().dao.watchAllProducts(),
                 builder:
@@ -247,7 +249,7 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
       width: 200,
       padding: EdgeInsets.only(right: 24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(10),
         color: Colors.white,
       ),
       child: DropdownButtonHideUnderline(

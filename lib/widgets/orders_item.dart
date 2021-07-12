@@ -17,12 +17,13 @@ class OrderItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 4.0),
             child: Container(
+              width: 75,
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: order.status == 'Open' ? Colors.green : order.status == 'Closed' ? Colors.blue : Colors.red
               ),
-              child: Text(order.status),
+              child: Center(child: Text(order.status)),
             ),
           )
         ],

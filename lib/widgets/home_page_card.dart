@@ -18,9 +18,11 @@ class HomePageCard extends StatelessWidget {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: GestureDetector(
+        child: InkWell(
           onTap: onTap,
           child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),),
             // color: AppColors.primaryLight,
             child: Padding(
               padding: const EdgeInsets.all(16.0),

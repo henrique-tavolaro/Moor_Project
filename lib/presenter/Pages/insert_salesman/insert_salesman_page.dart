@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:project/Theme/AppColors.dart';
 import 'package:project/database/database.dart';
-import 'package:project/domain/model/salesman.dart';
 import 'package:project/presenter/bloc/salesman_bloc/salesman_bloc.dart';
 import 'package:project/presenter/bloc/salesman_bloc/salesman_event.dart';
 
@@ -125,31 +123,38 @@ class _SalesmanListState extends State<SalesmanList> {
             itemCount: salesmanList.length,
             itemBuilder: (_, index) {
               final salesman = salesmanList[index];
-              return Card(
-                elevation: 2,
-                child: GestureDetector(
-                  onTap: () {
-                    print(salesman);
-                  },
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(8),
-                    leading: CircleAvatar(
-                      radius: 25,
-                      child: Text(
-                        '${salesman.name[0].toUpperCase()}',
-                        style: TextStyle(fontSize: 28),
+              return Dismissible(
+                key: new Key(salesman.name),
+                onDismissed: (direction){
+                  GetIt.I<SalesmanBloc>().add(DeleteSalesmanEvent(salesman));
+                },
+                background: Container(color: Colors.red,),
+                child: Card(
+                  elevation: 2,
+                  child: GestureDetector(
+                    onTap: () {
+                      print(salesman);
+                    },
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(8),
+                      leading: CircleAvatar(
+                        radius: 25,
+                        child: Text(
+                          '${salesman.name[0].toUpperCase()}',
+                          style: TextStyle(fontSize: 28),
+                        ),
+                        backgroundColor: AppColors.primaryDark,
                       ),
-                      backgroundColor: AppColors.primaryDark,
-                    ),
-                    title: Text(
-                      salesman.name,
-                      style: TextStyle(fontSize: 22),
-                    ),
-                    subtitle: Text(
-                      salesman.subsidiary,
-                      style: TextStyle(fontSize: 18),
-                    ),
+                      title: Text(
+                        salesman.name,
+                        style: TextStyle(fontSize: 22),
+                      ),
+                      subtitle: Text(
+                        salesman.subsidiary,
+                        style: TextStyle(fontSize: 18),
+                      ),
 
+                    ),
                   ),
                 ),
               );

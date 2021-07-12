@@ -27,5 +27,13 @@ class ProductsBloc extends Bloc<ProductEvent, ProductsState> {
         yield ErrorState(e.toString());
       }
     }
+    if (event is DeleteProductEvent) {
+      try{
+        final list = await dao.deleteProduct(event.product);
+        yield DeleteProductSuccessState();
+      } catch(e) {
+        yield ErrorState(e.toString());
+      }
+    }
   }
 }

@@ -22,3 +22,16 @@ class GetAllProductsEvent extends ProductEvent {
   List<Object?> get props => throw UnimplementedError();
 
 }
+
+
+class DeleteProductEvent extends ProductEvent {
+
+  final ProductsTableData product;
+
+  DeleteProductEvent(this.product);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+}

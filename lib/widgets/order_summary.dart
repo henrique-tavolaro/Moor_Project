@@ -15,13 +15,22 @@ class _OrderSummaryState extends State<OrderSummary> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(widget.orderWithFact.fact.productName),
-          Text(widget.orderWithFact.fact.quantity.toString()),
-          Text(widget.orderWithFact.fact.totalPrice.toString()),
-        ],
+      child: Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(flex: 1, child: Text(widget.orderWithFact.fact.productName)),
+            Expanded(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [Text(widget.orderWithFact.fact.quantity.toString()),
+                  Text(widget.orderWithFact.fact.totalPrice.toString(), textAlign: TextAlign.end,),],
+              ),
+            )
+
+          ],
+        ),
       ),
     );
   }
