@@ -100,7 +100,7 @@ class _DashboardPageState extends State<DashboardPage> {
       series.add(charts.Series<SalesBySalesmanResult, String>(
         id: 'Sales by Salesman',
         data: list,
-        domainFn: (SalesBySalesmanResult sales, _) => sales.name,
+        domainFn: (SalesBySalesmanResult sales, _) => sales.firstName,
         measureFn: (SalesBySalesmanResult sales, _) => sales.totalPrice
       ));
 

@@ -225,7 +225,7 @@ class _RegisterOrdersBodyState extends State<RegisterOrdersBody> {
       return DropdownMenuItem(
         value: salesman,
         child: RegisterOrdersChips(
-          text: salesman.name,
+          text: salesman.firstName,
           color: Colors.white,
         ),
       );

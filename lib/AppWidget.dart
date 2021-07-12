@@ -3,8 +3,8 @@ import 'package:project/database/database.dart';
 import 'package:project/injection_module.dart';
 import 'package:project/presenter/Pages/dashboard_page.dart';
 import 'package:project/presenter/Pages/home_page.dart';
-import 'package:project/presenter/Pages/insert_products/insert_products_page.dart';
-import 'package:project/presenter/Pages/insert_salesman/insert_salesman_page.dart';
+import 'package:project/presenter/Pages/insert_products_page.dart';
+import 'package:project/presenter/Pages/insert_salesman_page.dart';
 import 'package:project/presenter/Pages/orders_page.dart';
 import 'package:project/presenter/Pages/register_orders_page.dart';
 

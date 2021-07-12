@@ -44,7 +44,7 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
                   TextField(
                     controller: nameController,
                     decoration: InputDecoration(
-                        labelText: 'Salesman name',
+                        labelText: 'First name',
                         fillColor: Colors.white,
                         filled: true
                     ),
@@ -54,7 +54,7 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
                     child: TextField(
                       controller: subsidiaryController,
                       decoration: InputDecoration(
-                          labelText: 'Subsidiary',
+                          labelText: 'Last name',
                           fillColor: Colors.white,
                           filled: true
                       ),
@@ -88,8 +88,8 @@ class _InsertSalesmanPageState extends State<InsertSalesmanPage> {
 
   void addSalesman() {
     final salesman = SalesmanTableCompanion.insert(
-      name: nameController.text,
-      subsidiary: subsidiaryController.text,
+      firstName: nameController.text,
+      lastName: subsidiaryController.text,
     );
     GetIt.I<SalesmanBloc>().add(InsertSalesmanEvent(salesman));
     setState(() {});
@@ -124,7 +124,7 @@ class _SalesmanListState extends State<SalesmanList> {
             itemBuilder: (_, index) {
               final salesman = salesmanList[index];
               return Dismissible(
-                key: new Key(salesman.name),
+                key: new Key(salesman.firstName),
                 onDismissed: (direction){
                   GetIt.I<SalesmanBloc>().add(DeleteSalesmanEvent(salesman));
                 },
@@ -140,17 +140,17 @@ class _SalesmanListState extends State<SalesmanList> {
                       leading: CircleAvatar(
                         radius: 25,
                         child: Text(
-                          '${salesman.name[0].toUpperCase()}',
+                          '${salesman.firstName[0].toUpperCase()}',
                           style: TextStyle(fontSize: 28),
                         ),
                         backgroundColor: AppColors.primaryDark,
                       ),
                       title: Text(
-                        salesman.name,
+                        salesman.firstName,
                         style: TextStyle(fontSize: 22),
                       ),
                       subtitle: Text(
-                        salesman.subsidiary,
+                        salesman.lastName,
                         style: TextStyle(fontSize: 18),
                       ),
 

@@ -76,7 +76,7 @@ class _BottomDialogState extends State<BottomDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Date: ${widget.date!}'),
-                    Text('Salesman: ${widget.salesman!.name}')
+                    Text('Salesman: ${widget.salesman!.firstName}')
                   ],
                 ),
               ),

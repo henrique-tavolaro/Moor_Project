@@ -8,12 +8,12 @@ class SalesmanTable extends Table {
 
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
 
-  TextColumn get name => text().withLength(min: 1, max: 50)();
+  TextColumn get firstName => text().withLength(min: 1, max: 10)();
 
-  TextColumn get subsidiary => text().withLength(min: 1, max: 50)();
+  TextColumn get lastName => text().withLength(min: 1, max: 50)();
 
   @override
-  Set<Column> get primaryKey => {id, name};
+  Set<Column> get primaryKey => {id, firstName};
 }
 
 class ProductsTable extends Table {
@@ -78,13 +78,13 @@ class FactTable extends Table {
   OrdersTable
 ], queries: {
   'salesBySalesman': 'SELECT '
-      'b.name, '
+      'b.first_name, '
       'a.total_price '
       'FROM fact_Table a '
       'JOIN salesman_table b '
       'ON a.salesman_id = b.id '
       'WHERE month = ? '
-      'GROUP BY b.name;',
+      'GROUP BY b.first_name;',
   'salesByProduct':
       'SELECT '
           'product_name, '
@@ -179,7 +179,7 @@ class SalesmanDao extends DatabaseAccessor<AppDatabase>
       select(salesmanTable).get();
 
   Stream<List<SalesmanTableData>> watchAllSalesman() => (select(salesmanTable)
-        ..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        ..orderBy([(t) => OrderingTerm(expression: t.firstName)]))
       .watch();
 
   Future deleteSalesman(SalesmanTableData salesman) => delete(salesmanTable).delete(salesman);
